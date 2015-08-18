@@ -1,0 +1,77 @@
+From openclogger-svn at lists.berlios.de  Fri Dec 29 00:56:45 2006
+From: openclogger-svn at lists.berlios.de (openclogger-svn at lists.berlios.de)
+Date: Fri, 29 Dec 2006 00:56:45 +0100
+Subject: [Openclogger-svn] r9 - trunk/OCControls
+Message-ID: <200612282356.kBSNujiv020182@sheep.berlios.de>
+
+Author: nkilzer
+Date: 2006-12-29 00:56:32 +0100 (Fri, 29 Dec 2006)
+New Revision: 9
+
+Removed:
+   trunk/OCControls/IPaintBackground.cs
+   trunk/OCControls/OCButton.cs
+   trunk/OCControls/OCControls.csproj
+   trunk/OCControls/OCForm.cs
+   trunk/OCControls/OCLabel.cs
+   trunk/OCControls/OCLinkLabel.cs
+   trunk/OCControls/OCPictureBox.cs
+   trunk/OCControls/OCSkinManager.cs
+   trunk/OCControls/OCTabControl.cs
+   trunk/OCControls/OCTabPage.cs
+   trunk/OCControls/OCTooltipForm.cs
+   trunk/OCControls/OCTooltipForm.resx
+   trunk/OCControls/Properties/
+
+Log:
+Restarting in MonoDevelop.
+
+Deleted: trunk/OCControls/IPaintBackground.cs
+
+Deleted: trunk/OCControls/OCButton.cs
+
+Deleted: trunk/OCControls/OCControls.csproj
+
+Deleted: trunk/OCControls/OCForm.cs
+
+Deleted: trunk/OCControls/OCLabel.cs
+
+Deleted: trunk/OCControls/OCLinkLabel.cs
+
+Deleted: trunk/OCControls/OCPictureBox.cs
+
+Deleted: trunk/OCControls/OCSkinManager.cs
+
+Deleted: trunk/OCControls/OCTabControl.cs
+
+Deleted: trunk/OCControls/OCTabPage.cs
+
+Deleted: trunk/OCControls/OCTooltipForm.cs
+
+Deleted: trunk/OCControls/OCTooltipForm.resx
+
+
+
+From openclogger-svn at lists.berlios.de  Fri Dec 29 01:00:42 2006
+From: openclogger-svn at lists.berlios.de (openclogger-svn at lists.berlios.de)
+Date: Fri, 29 Dec 2006 01:00:42 +0100
+Subject: [Openclogger-svn] r10 - trunk
+Message-ID: <200612290000.kBT00gFH025768@sheep.berlios.de>
+
+Author: nkilzer
+Date: 2006-12-29 01:00:36 +0100 (Fri, 29 Dec 2006)
+New Revision: 10
+
+Removed:
+   trunk/OCControls/
+   trunk/OCInterface/
+   trunk/OpenClogger.sln
+   trunk/OpenClogger/
+
+Log:
+Restarting in MonoDevelop on Linux.
+
+Deleted: trunk/OpenClogger.sln
+
+
+

@@ -1,0 +1,1453 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Openclogger-svn] r3 - in trunk: . OCControls OCControls/Properties	OCInterface OCInterface/Properties OpenClogger	OpenClogger/Properties
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/openclogger-svn/2006-October/index.html" >
+   <LINK REL="made" HREF="mailto:openclogger-svn%40lists.berlios.de?Subject=Re%3A%20%5BOpenclogger-svn%5D%20r3%20-%20in%20trunk%3A%20.%20OCControls%20OCControls/Properties%0A%09OCInterface%20OCInterface/Properties%20OpenClogger%0A%09OpenClogger/Properties&In-Reply-To=%3C200610241802.k9OI2X64009847%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000001.html">
+   <LINK REL="Next"  HREF="000003.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Openclogger-svn] r3 - in trunk: . OCControls OCControls/Properties	OCInterface OCInterface/Properties OpenClogger	OpenClogger/Properties</H1>
+    <B>openclogger-svn at lists.berlios.de</B> 
+    <A HREF="mailto:openclogger-svn%40lists.berlios.de?Subject=Re%3A%20%5BOpenclogger-svn%5D%20r3%20-%20in%20trunk%3A%20.%20OCControls%20OCControls/Properties%0A%09OCInterface%20OCInterface/Properties%20OpenClogger%0A%09OpenClogger/Properties&In-Reply-To=%3C200610241802.k9OI2X64009847%40sheep.berlios.de%3E"
+       TITLE="[Openclogger-svn] r3 - in trunk: . OCControls OCControls/Properties	OCInterface OCInterface/Properties OpenClogger	OpenClogger/Properties">openclogger-svn at lists.berlios.de
+       </A><BR>
+    <I>Tue Oct 24 20:02:33 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000001.html">[Openclogger-svn] r2 - /
+</A></li>
+        <LI>Next message: <A HREF="000003.html">[Openclogger-svn] r4 - in trunk: OCControls OCControls/Properties	OCInterface OCInterface/Properties OpenClogger	OpenClogger/Properties
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#2">[ date ]</a>
+              <a href="thread.html#2">[ thread ]</a>
+              <a href="subject.html#2">[ subject ]</a>
+              <a href="author.html#2">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: nkilzer
+Date: 2006-10-24 20:02:11 +0200 (Tue, 24 Oct 2006)
+New Revision: 3
+
+Added:
+   trunk/AUTHORS
+   trunk/LICENSE
+   trunk/OCControls/
+   trunk/OCControls/OCButton.cs
+   trunk/OCControls/OCControls.csproj
+   trunk/OCControls/OCForm.cs
+   trunk/OCControls/OCLabel.cs
+   trunk/OCControls/Properties/
+   trunk/OCControls/Properties/AssemblyInfo.cs
+   trunk/OCInterface/
+   trunk/OCInterface/OCInterface.csproj
+   trunk/OCInterface/Properties/
+   trunk/OCInterface/Properties/AssemblyInfo.cs
+   trunk/OCInterface/SvnAttributes.cs
+   trunk/OpenClogger.sln
+   trunk/OpenClogger/
+   trunk/OpenClogger/MainForm.Designer.cs
+   trunk/OpenClogger/MainForm.cs
+   trunk/OpenClogger/OpenClogger.csproj
+   trunk/OpenClogger/Program.cs
+   trunk/OpenClogger/Properties/
+   trunk/OpenClogger/Properties/AssemblyInfo.cs
+   trunk/OpenClogger/Properties/Resources.Designer.cs
+   trunk/OpenClogger/Properties/Resources.resx
+   trunk/OpenClogger/Properties/Settings.Designer.cs
+   trunk/OpenClogger/Properties/Settings.settings
+   trunk/docs/
+
+Log:
+Initial import of the OpenClogger solution files. From here on, all changes will be need to be done under source control.
+
+Added: trunk/AUTHORS
+===================================================================
+--- trunk/AUTHORS	2006-10-22 16:30:54 UTC (rev 2)
++++ trunk/AUTHORS	2006-10-24 18:02:11 UTC (rev 3)
+@@ -0,0 +1,30 @@
++This file contains a list of everyone who has contributed to the OpenClogger
++Project. In general, the project contributers do not wish to receive any
++unsolicited email not pertinent to the project. Please respect their wishes.
++
++Additionally, the project contributors would prefer to receive bug reports,
++feature requests, patches and support requests in the appropriate tracker at
++<A HREF="http://developer.berlios.de/projects/openclogger,">http://developer.berlios.de/projects/openclogger,</A> or acessible from the
++OpenClogger homepage at <A HREF="http://openclogger.berlios.de.">http://openclogger.berlios.de.</A>
++
++Contributions to this software have been provided by the following people, with
++major contributions listed below each name:
++
++Original Author(s)
++==============================================================
++Nate Kilzer						   &lt; nkilzer at gmail dot com &gt;
++
++Active Developers
++==============================================================
++
++Retired/Inactive/Infrequent Developers
++==============================================================
++
++Testers/QA
++==============================================================
++
++Packagers
++==============================================================
++
++Other Contributors
++==============================================================
+
+Added: trunk/LICENSE
+===================================================================
+--- trunk/LICENSE	2006-10-22 16:30:54 UTC (rev 2)
++++ trunk/LICENSE	2006-10-24 18:02:11 UTC (rev 3)
+@@ -0,0 +1,23 @@
++Copyright (c) 2006 OpenClogger Project
++
++Permission is hereby granted, free of charge, to any person obtaining a copy of
++this software and associated documentation files (the &quot;Software&quot;), to deal in
++the Software without restriction, including without limitation the rights to
++use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
++the Software, and to permit persons to whom the Software is furnished to do so,
++subject to the following conditions:
++
++The above copyright notice and this permission notice shall be included in all
++copies or substantial portions of the Software. The origin of the Software shall
++not be misconstrued or stated to be any body other than the OpenClogger Project.
++
++Neither the name of the OpenClogger Project nor the names of its contributors
++may be used to endorse or promote products derived from this software without
++specific prior written permission.
++
++THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
++FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
++COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
++IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
++CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+\ No newline at end of file
+
+Added: trunk/OCControls/OCButton.cs
+===================================================================
+--- trunk/OCControls/OCButton.cs	2006-10-22 16:30:54 UTC (rev 2)
++++ trunk/OCControls/OCButton.cs	2006-10-24 18:02:11 UTC (rev 3)
+@@ -0,0 +1,38 @@
++/////////////////////////////////////////////////////////
++//
++// OpenClogger - OCControls - OCButton.cs
++// $Id$
++// $HeadURL$
++//
++// Copyright (c) 2006 OpenClogger Project
++//
++// This file is part of the sources for OpenClogger. It
++// is released under the OpenClogger License. Details of
++// the license can be found in the LICENSE file in the
++// root of the distribution or at the following URL:
++//
++// <A HREF="http://svn.berlios.de/svnroot/repos/openclogger/trunk/LICENSE">http://svn.berlios.de/svnroot/repos/openclogger/trunk/LICENSE</A>
++//
++
++using System;
++using System.Collections.Generic;
++using System.ComponentModel;
++using System.Drawing;
++using System.Data;
++using System.Text;
++using System.Windows.Forms;
++
++// Subversion version control attributes
++using OCInterface.SvnAttributes;
++[assembly: SvnId(&quot;OCButton.cs&quot;, &quot;$Id$&quot;)]
++[assembly: SvnRevision(&quot;OCButton.cs&quot;, &quot;$Revision$&quot;)]
++[assembly: SvnAuthor(&quot;OCButton.cs&quot;, &quot;$Author$&quot;)]
++[assembly: SvnHeadUrl(&quot;OCButton.cs&quot;, &quot;$HeadURL$&quot;)]
++[assembly: SvnDate(&quot;OCButton.cs&quot;, &quot;$Date$&quot;)]
++
++namespace OCControls
++{
++    public partial class OCButton : Button
++    {
++    }
++}
+
+
+Property changes on: trunk/OCControls/OCButton.cs
+___________________________________________________________________
+Name: svn-keywords
+   + Id Date HeadURL Author
+Name: svn:eol-style
+   + native
+
+Added: trunk/OCControls/OCControls.csproj
+===================================================================
+--- trunk/OCControls/OCControls.csproj	2006-10-22 16:30:54 UTC (rev 2)
++++ trunk/OCControls/OCControls.csproj	2006-10-24 18:02:11 UTC (rev 3)
+@@ -0,0 +1,63 @@
++&#65279;&lt;Project DefaultTargets=&quot;Build&quot; xmlns=&quot;<A HREF="http://schemas.microsoft.com/developer/msbuild/2003">http://schemas.microsoft.com/developer/msbuild/2003</A>&quot;&gt;
++  &lt;PropertyGroup&gt;
++    &lt;Configuration Condition=&quot; '$(Configuration)' == '' &quot;&gt;Debug&lt;/Configuration&gt;
++    &lt;Platform Condition=&quot; '$(Platform)' == '' &quot;&gt;AnyCPU&lt;/Platform&gt;
++    &lt;ProductVersion&gt;8.0.50727&lt;/ProductVersion&gt;
++    &lt;SchemaVersion&gt;2.0&lt;/SchemaVersion&gt;
++    &lt;ProjectGuid&gt;{66061D7E-5174-4681-868C-09BFA6C6A7E3}&lt;/ProjectGuid&gt;
++    &lt;OutputType&gt;Library&lt;/OutputType&gt;
++    &lt;AppDesignerFolder&gt;Properties&lt;/AppDesignerFolder&gt;
++    &lt;RootNamespace&gt;OCControls&lt;/RootNamespace&gt;
++    &lt;AssemblyName&gt;OCControls&lt;/AssemblyName&gt;
++  &lt;/PropertyGroup&gt;
++  &lt;PropertyGroup Condition=&quot; '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' &quot;&gt;
++    &lt;DebugSymbols&gt;true&lt;/DebugSymbols&gt;
++    &lt;DebugType&gt;full&lt;/DebugType&gt;
++    &lt;Optimize&gt;false&lt;/Optimize&gt;
++    &lt;OutputPath&gt;bin\Debug\&lt;/OutputPath&gt;
++    &lt;DefineConstants&gt;DEBUG;TRACE&lt;/DefineConstants&gt;
++    &lt;ErrorReport&gt;prompt&lt;/ErrorReport&gt;
++    &lt;WarningLevel&gt;4&lt;/WarningLevel&gt;
++  &lt;/PropertyGroup&gt;
++  &lt;PropertyGroup Condition=&quot; '$(Configuration)|$(Platform)' == 'Release|AnyCPU' &quot;&gt;
++    &lt;DebugType&gt;pdbonly&lt;/DebugType&gt;
++    &lt;Optimize&gt;true&lt;/Optimize&gt;
++    &lt;OutputPath&gt;bin\Release\&lt;/OutputPath&gt;
++    &lt;DefineConstants&gt;TRACE&lt;/DefineConstants&gt;
++    &lt;ErrorReport&gt;prompt&lt;/ErrorReport&gt;
++    &lt;WarningLevel&gt;4&lt;/WarningLevel&gt;
++  &lt;/PropertyGroup&gt;
++  &lt;ItemGroup&gt;
++    &lt;Reference Include=&quot;System&quot; /&gt;
++    &lt;Reference Include=&quot;System.Data&quot; /&gt;
++    &lt;Reference Include=&quot;System.Drawing&quot; /&gt;
++    &lt;Reference Include=&quot;System.Windows.Forms&quot; /&gt;
++    &lt;Reference Include=&quot;System.Xml&quot; /&gt;
++  &lt;/ItemGroup&gt;
++  &lt;ItemGroup&gt;
++    &lt;Compile Include=&quot;OCButton.cs&quot;&gt;
++      &lt;SubType&gt;Component&lt;/SubType&gt;
++    &lt;/Compile&gt;
++    &lt;Compile Include=&quot;OCForm.cs&quot;&gt;
++      &lt;SubType&gt;Form&lt;/SubType&gt;
++    &lt;/Compile&gt;
++    &lt;Compile Include=&quot;OCLabel.cs&quot;&gt;
++      &lt;SubType&gt;Component&lt;/SubType&gt;
++    &lt;/Compile&gt;
++    &lt;Compile Include=&quot;Properties\AssemblyInfo.cs&quot; /&gt;
++  &lt;/ItemGroup&gt;
++  &lt;ItemGroup&gt;
++    &lt;ProjectReference Include=&quot;..\OCInterface\OCInterface.csproj&quot;&gt;
++      &lt;Project&gt;{53D9195E-244C-4C9A-B0C1-B682FA70C00A}&lt;/Project&gt;
++      &lt;Name&gt;OCInterface&lt;/Name&gt;
++    &lt;/ProjectReference&gt;
++  &lt;/ItemGroup&gt;
++  &lt;Import Project=&quot;$(MSBuildBinPath)\Microsoft.CSharp.targets&quot; /&gt;
++  &lt;!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
++       Other similar extension points exist, see Microsoft.Common.targets.
++  &lt;Target Name=&quot;BeforeBuild&quot;&gt;
++  &lt;/Target&gt;
++  &lt;Target Name=&quot;AfterBuild&quot;&gt;
++  &lt;/Target&gt;
++  --&gt;
++&lt;/Project&gt;
+\ No newline at end of file
+
+
+Property changes on: trunk/OCControls/OCControls.csproj
+___________________________________________________________________
+Name: svn:needs-lock
+   + *
+Name: svn:eol-style
+   + CRLF
+
+Added: trunk/OCControls/OCForm.cs
+===================================================================
+--- trunk/OCControls/OCForm.cs	2006-10-22 16:30:54 UTC (rev 2)
++++ trunk/OCControls/OCForm.cs	2006-10-24 18:02:11 UTC (rev 3)
+@@ -0,0 +1,38 @@
++/////////////////////////////////////////////////////////
++//
++// OpenClogger - OCControls - OCForm.cs
++// $Id$
++// $HeadURL$
++//
++// Copyright (c) 2006 OpenClogger Project
++//
++// This file is part of the sources for OpenClogger. It
++// is released under the OpenClogger License. Details of
++// the license can be found in the LICENSE file in the
++// root of the distribution or at the following URL:
++//
++// <A HREF="http://svn.berlios.de/svnroot/repos/openclogger/trunk/LICENSE">http://svn.berlios.de/svnroot/repos/openclogger/trunk/LICENSE</A>
++//
++
++using System;
++using System.Collections.Generic;
++using System.ComponentModel;
++using System.Drawing;
++using System.Data;
++using System.Text;
++using System.Windows.Forms;
++
++// Subversion version control attributes
++using OCInterface.SvnAttributes;
++[assembly: SvnId(&quot;OCForm.cs&quot;, &quot;$Id$&quot;)]
++[assembly: SvnRevision(&quot;OCForm.cs&quot;, &quot;$Revision$&quot;)]
++[assembly: SvnAuthor(&quot;OCForm.cs&quot;, &quot;$Author$&quot;)]
++[assembly: SvnHeadUrl(&quot;OCForm.cs&quot;, &quot;$HeadURL$&quot;)]
++[assembly: SvnDate(&quot;OCForm.cs&quot;, &quot;$Date$&quot;)]
++
++namespace OCControls
++{
++    public partial class OCForm : Form
++    {
++    }
++}
+
+
+Property changes on: trunk/OCControls/OCForm.cs
+___________________________________________________________________
+Name: svn-keywords
+   + Id Date HeadURL Author
+Name: svn:eol-style
+   + native
+
+Added: trunk/OCControls/OCLabel.cs
+===================================================================
+--- trunk/OCControls/OCLabel.cs	2006-10-22 16:30:54 UTC (rev 2)
++++ trunk/OCControls/OCLabel.cs	2006-10-24 18:02:11 UTC (rev 3)
+@@ -0,0 +1,38 @@
++/////////////////////////////////////////////////////////
++//
++// OpenClogger - OCControls - OCLabel.cs
++// $Id$
++// $HeadURL$
++//
++// Copyright (c) 2006 OpenClogger Project
++//
++// This file is part of the sources for OpenClogger. It
++// is released under the OpenClogger License. Details of
++// the license can be found in the LICENSE file in the
++// root of the distribution or at the following URL:
++//
++// <A HREF="http://svn.berlios.de/svnroot/repos/openclogger/trunk/LICENSE">http://svn.berlios.de/svnroot/repos/openclogger/trunk/LICENSE</A>
++//
++
++using System;
++using System.Collections.Generic;
++using System.ComponentModel;
++using System.Drawing;
++using System.Data;
++using System.Text;
++using System.Windows.Forms;
++
++// Subversion version control attributes
++using OCInterface.SvnAttributes;
++[assembly: SvnId(&quot;OCLabel.cs&quot;, &quot;$Id$&quot;)]
++[assembly: SvnRevision(&quot;OCLabel.cs&quot;, &quot;$Revision$&quot;)]
++[assembly: SvnAuthor(&quot;OCLabel.cs&quot;, &quot;$Author$&quot;)]
++[assembly: SvnHeadUrl(&quot;OCLabel.cs&quot;, &quot;$HeadURL$&quot;)]
++[assembly: SvnDate(&quot;OCLabel.cs&quot;, &quot;$Date$&quot;)]
++
++namespace OCControls
++{
++    public partial class OCLabel : Label
++    {
++    }
++}
+
+
+Property changes on: trunk/OCControls/OCLabel.cs
+___________________________________________________________________
+Name: svn-keywords
+   + Id Date HeadURL Author
+Name: svn:eol-style
+   + native
+
+Added: trunk/OCControls/Properties/AssemblyInfo.cs
+===================================================================
+--- trunk/OCControls/Properties/AssemblyInfo.cs	2006-10-22 16:30:54 UTC (rev 2)
++++ trunk/OCControls/Properties/AssemblyInfo.cs	2006-10-24 18:02:11 UTC (rev 3)
+@@ -0,0 +1,64 @@
++&#65279;/////////////////////////////////////////////////////////
++//
++// OpenClogger - OCControls - AssemblyInfo.cs
++// $Id$
++// $HeadURL$
++//
++// Copyright (c) 2006 OpenClogger Project
++//
++// This file is part of the sources for OpenClogger. It
++// is released under the OpenClogger License. Details of
++// the license can be found in the LICENSE file in the
++// root of the distribution or at the following URL:
++//
++// <A HREF="http://svn.berlios.de/svnroot/repos/openclogger/trunk/LICENSE">http://svn.berlios.de/svnroot/repos/openclogger/trunk/LICENSE</A>
++//
++
++using System;
++using System.Reflection;
++using System.Runtime.CompilerServices;
++using System.Runtime.InteropServices;
++using OCInterface.SvnAttributes;
++
++// General Information about an assembly is controlled through the following 
++// set of attributes. Change these attribute values to modify the information
++// associated with an assembly.
++[assembly: AssemblyTitle(&quot;OCControls&quot;)]
++[assembly: AssemblyDescription(&quot;&quot;)]
++[assembly: AssemblyConfiguration(&quot;&quot;)]
++[assembly: AssemblyCompany(&quot;OpenClogger Project&quot;)]
++[assembly: AssemblyProduct(&quot;OpenClogger&quot;)]
++[assembly: AssemblyCopyright(&quot;Copyright &#169; 2006 OpenClogger Project&quot;)]
++[assembly: AssemblyTrademark(&quot;&quot;)]
++[assembly: AssemblyCulture(&quot;&quot;)]
++
++// Assemblies should all be CLS compliant.
++[assembly: CLSCompliant(true)]
++
++// Setting ComVisible to false makes the types in this assembly not visible 
++// to COM components.  If you need to access a type in this assembly from 
++// COM, set the ComVisible attribute to true on that type.
++[assembly: ComVisible(false)]
++
++// The following GUID is for the ID of the typelib if this project is exposed to COM
++[assembly: Guid(&quot;c0d941a0-838b-4394-b04e-dad459c71f56&quot;)]
++
++// Version information for an assembly consists of the following four values:
++//
++//      Major Version
++//      Minor Version 
++//      Build Number
++//      Revision
++//
++// You can specify all the values or you can default the Revision and Build Numbers 
++// by using the '*' as shown below:
++[assembly: AssemblyVersion(&quot;0.0.1.0&quot;)]
++[assembly: AssemblyFileVersion(&quot;0.0.1.0&quot;)]
++[assembly: AssemblyInformationalVersion(&quot;0.0.1.0&quot;)]
++
++// Subversion version control attributes
++[assembly: SvnId(&quot;AssemblyInfo.cs&quot;, &quot;$Id$&quot;)]
++[assembly: SvnRevision(&quot;AssemblyInfo.cs&quot;, &quot;$Revision$&quot;)]
++[assembly: SvnAuthor(&quot;AssemblyInfo.cs&quot;, &quot;$Author$&quot;)]
++[assembly: SvnHeadUrl(&quot;AssemblyInfo.cs&quot;, &quot;$HeadURL$&quot;)]
++[assembly: SvnDate(&quot;AssemblyInfo.cs&quot;, &quot;$Date$&quot;)]
+\ No newline at end of file
+
+
+Property changes on: trunk/OCControls/Properties/AssemblyInfo.cs
+___________________________________________________________________
+Name: svn-keywords
+   + Id Date HeadURL Author
+Name: svn:eol-style
+   + native
+
+Added: trunk/OCInterface/OCInterface.csproj
+===================================================================
+--- trunk/OCInterface/OCInterface.csproj	2006-10-22 16:30:54 UTC (rev 2)
++++ trunk/OCInterface/OCInterface.csproj	2006-10-24 18:02:11 UTC (rev 3)
+@@ -0,0 +1,47 @@
++&#65279;&lt;Project DefaultTargets=&quot;Build&quot; xmlns=&quot;<A HREF="http://schemas.microsoft.com/developer/msbuild/2003">http://schemas.microsoft.com/developer/msbuild/2003</A>&quot;&gt;
++  &lt;PropertyGroup&gt;
++    &lt;Configuration Condition=&quot; '$(Configuration)' == '' &quot;&gt;Debug&lt;/Configuration&gt;
++    &lt;Platform Condition=&quot; '$(Platform)' == '' &quot;&gt;AnyCPU&lt;/Platform&gt;
++    &lt;ProductVersion&gt;8.0.50727&lt;/ProductVersion&gt;
++    &lt;SchemaVersion&gt;2.0&lt;/SchemaVersion&gt;
++    &lt;ProjectGuid&gt;{53D9195E-244C-4C9A-B0C1-B682FA70C00A}&lt;/ProjectGuid&gt;
++    &lt;OutputType&gt;Library&lt;/OutputType&gt;
++    &lt;AppDesignerFolder&gt;Properties&lt;/AppDesignerFolder&gt;
++    &lt;RootNamespace&gt;OCInterface&lt;/RootNamespace&gt;
++    &lt;AssemblyName&gt;OCInterface&lt;/AssemblyName&gt;
++  &lt;/PropertyGroup&gt;
++  &lt;PropertyGroup Condition=&quot; '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' &quot;&gt;
++    &lt;DebugSymbols&gt;true&lt;/DebugSymbols&gt;
++    &lt;DebugType&gt;full&lt;/DebugType&gt;
++    &lt;Optimize&gt;false&lt;/Optimize&gt;
++    &lt;OutputPath&gt;bin\Debug\&lt;/OutputPath&gt;
++    &lt;DefineConstants&gt;DEBUG;TRACE&lt;/DefineConstants&gt;
++    &lt;ErrorReport&gt;prompt&lt;/ErrorReport&gt;
++    &lt;WarningLevel&gt;4&lt;/WarningLevel&gt;
++  &lt;/PropertyGroup&gt;
++  &lt;PropertyGroup Condition=&quot; '$(Configuration)|$(Platform)' == 'Release|AnyCPU' &quot;&gt;
++    &lt;DebugType&gt;pdbonly&lt;/DebugType&gt;
++    &lt;Optimize&gt;true&lt;/Optimize&gt;
++    &lt;OutputPath&gt;bin\Release\&lt;/OutputPath&gt;
++    &lt;DefineConstants&gt;TRACE&lt;/DefineConstants&gt;
++    &lt;ErrorReport&gt;prompt&lt;/ErrorReport&gt;
++    &lt;WarningLevel&gt;4&lt;/WarningLevel&gt;
++  &lt;/PropertyGroup&gt;
++  &lt;ItemGroup&gt;
++    &lt;Reference Include=&quot;System&quot; /&gt;
++    &lt;Reference Include=&quot;System.Data&quot; /&gt;
++    &lt;Reference Include=&quot;System.Xml&quot; /&gt;
++  &lt;/ItemGroup&gt;
++  &lt;ItemGroup&gt;
++    &lt;Compile Include=&quot;SvnAttributes.cs&quot; /&gt;
++    &lt;Compile Include=&quot;Properties\AssemblyInfo.cs&quot; /&gt;
++  &lt;/ItemGroup&gt;
++  &lt;Import Project=&quot;$(MSBuildBinPath)\Microsoft.CSharp.targets&quot; /&gt;
++  &lt;!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
++       Other similar extension points exist, see Microsoft.Common.targets.
++  &lt;Target Name=&quot;BeforeBuild&quot;&gt;
++  &lt;/Target&gt;
++  &lt;Target Name=&quot;AfterBuild&quot;&gt;
++  &lt;/Target&gt;
++  --&gt;
++&lt;/Project&gt;
+\ No newline at end of file
+
+
+Property changes on: trunk/OCInterface/OCInterface.csproj
+___________________________________________________________________
+Name: svn:needs-lock
+   + *
+Name: svn:eol-style
+   + CRLF
+
+Added: trunk/OCInterface/Properties/AssemblyInfo.cs
+===================================================================
+--- trunk/OCInterface/Properties/AssemblyInfo.cs	2006-10-22 16:30:54 UTC (rev 2)
++++ trunk/OCInterface/Properties/AssemblyInfo.cs	2006-10-24 18:02:11 UTC (rev 3)
+@@ -0,0 +1,64 @@
++&#65279;/////////////////////////////////////////////////////////
++//
++// OCInterface - OCInterface - AssemblyInfo.cs
++// $Id$
++// $HeadURL$
++//
++// Copyright (c) 2006 OCInterface Project
++//
++// This file is part of the sources for OCInterface. It
++// is released under the OCInterface License. Details of
++// the license can be found in the LICENSE file in the
++// root of the distribution or at the following URL:
++//
++// <A HREF="http://svn.berlios.de/svnroot/repos/OCInterface/trunk/LICENSE">http://svn.berlios.de/svnroot/repos/OCInterface/trunk/LICENSE</A>
++//
++
++using System;
++using System.Reflection;
++using System.Runtime.CompilerServices;
++using System.Runtime.InteropServices;
++using OCInterface.SvnAttributes;
++
++// General Information about an assembly is controlled through the following 
++// set of attributes. Change these attribute values to modify the information
++// associated with an assembly.
++[assembly: AssemblyTitle(&quot;OCInterface&quot;)]
++[assembly: AssemblyDescription(&quot;&quot;)]
++[assembly: AssemblyConfiguration(&quot;&quot;)]
++[assembly: AssemblyCompany(&quot;OpenClogger Project&quot;)]
++[assembly: AssemblyProduct(&quot;OpenClogger&quot;)]
++[assembly: AssemblyCopyright(&quot;Copyright &#169; 2006 OpenClogger Project&quot;)]
++[assembly: AssemblyTrademark(&quot;&quot;)]
++[assembly: AssemblyCulture(&quot;&quot;)]
++
++// Assemblies should all be CLS compliant.
++[assembly: CLSCompliant(true)]
++
++// Setting ComVisible to false makes the types in this assembly not visible 
++// to COM components.  If you need to access a type in this assembly from 
++// COM, set the ComVisible attribute to true on that type.
++[assembly: ComVisible(false)]
++
++// The following GUID is for the ID of the typelib if this project is exposed to COM
++[assembly: Guid(&quot;45f68b4a-2292-4c63-a3cc-381387c74058&quot;)]
++
++// Version information for an assembly consists of the following four values:
++//
++//      Major Version
++//      Minor Version 
++//      Build Number
++//      Revision
++//
++// You can specify all the values or you can default the Revision and Build Numbers 
++// by using the '*' as shown below:
++[assembly: AssemblyVersion(&quot;0.0.1.0&quot;)]
++[assembly: AssemblyFileVersion(&quot;0.0.1.0&quot;)]
++[assembly: AssemblyInformationalVersion(&quot;0.0.1.0&quot;)]
++
++// Subversion version control attributes
++[assembly: SvnId(&quot;AssemblyInfo.cs&quot;, &quot;$Id$&quot;)]
++[assembly: SvnRevision(&quot;AssemblyInfo.cs&quot;, &quot;$Revision$&quot;)]
++[assembly: SvnAuthor(&quot;AssemblyInfo.cs&quot;, &quot;$Author$&quot;)]
++[assembly: SvnHeadUrl(&quot;AssemblyInfo.cs&quot;, &quot;$HeadURL$&quot;)]
++[assembly: SvnDate(&quot;AssemblyInfo.cs&quot;, &quot;$Date$&quot;)]
+\ No newline at end of file
+
+
+Property changes on: trunk/OCInterface/Properties/AssemblyInfo.cs
+___________________________________________________________________
+Name: svn-keywords
+   + Id Date HeadURL Author
+Name: svn:eol-style
+   + native
+
+Added: trunk/OCInterface/SvnAttributes.cs
+===================================================================
+--- trunk/OCInterface/SvnAttributes.cs	2006-10-22 16:30:54 UTC (rev 2)
++++ trunk/OCInterface/SvnAttributes.cs	2006-10-24 18:02:11 UTC (rev 3)
+@@ -0,0 +1,140 @@
++/////////////////////////////////////////////////////////
++//
++// OCInterface - OCInterface - SvnAttributes.cs
++// $Id$
++// $HeadURL$
++//
++// Copyright (c) 2006 OCInterface Project
++//
++// This file is part of the sources for OCInterface. It
++// is released under the OCInterface License. Details of
++// the license can be found in the LICENSE file in the
++// root of the distribution or at the following URL:
++//
++// <A HREF="http://Svn.berlios.de/Svnroot/repos/OCInterface/trunk/LICENSE">http://Svn.berlios.de/Svnroot/repos/OCInterface/trunk/LICENSE</A>
++//
++
++using System;
++
++// Subversion version control attributes
++using OCInterface.SvnAttributes;
++[assembly: SvnId(&quot;SvnAttributes.cs&quot;, &quot;$Id$&quot;)]
++[assembly: SvnRevision(&quot;SvnAttributes.cs&quot;, &quot;$Revision$&quot;)]
++[assembly: SvnAuthor(&quot;SvnAttributes.cs&quot;, &quot;$Author$&quot;)]
++[assembly: SvnHeadUrl(&quot;SvnAttributes.cs&quot;, &quot;$HeadURL$&quot;)]
++[assembly: SvnDate(&quot;SvnAttributes.cs&quot;, &quot;$Date$&quot;)]
++
++namespace OCInterface.SvnAttributes
++{
++    [AttributeUsage(AttributeTargets.Assembly, AllowMultiple=true, Inherited=false)]
++    public class SvnRevisionAttribute : Attribute
++    {
++        public SvnRevisionAttribute( string file, string revision )
++        {
++            mSvnRevision = (string)revision.Clone();
++        }
++
++        public string SvnRevision
++        {
++            get { return mSvnRevision; }
++        }
++
++        public int Revision
++        {
++            get
++            {
++                return 0;
++            }
++        }
++
++        private string mSvnRevision = null;
++    }
++
++    [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true, Inherited = false)]
++    public class SvnIdAttribute : Attribute
++    {
++        public SvnIdAttribute(string file, string id)
++        {
++            mSvnId = (string)id.Clone();
++        }
++
++        public string SvnId
++        {
++            get { return mSvnId; }
++        }
++
++        private string mSvnId = null;
++    }
++
++    [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true, Inherited = false)]
++    public class SvnAuthorAttribute : Attribute
++    {
++        public SvnAuthorAttribute(string file, string author)
++        {
++            mSvnAuthor = (string)author.Clone();
++        }
++
++        public string SvnAuthor
++        {
++            get { return mSvnAuthor; }
++        }
++
++        public string Author
++        {
++            get
++            {
++                return null;
++            }
++        }
++
++        private string mSvnAuthor = null;
++    }
++
++    [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true, Inherited = false)]
++    public class SvnHeadUrlAttribute : Attribute
++    {
++        public SvnHeadUrlAttribute(string file, string headUrl)
++        {
++            mSvnHeadUrl = (string)headUrl.Clone();
++        }
++
++        public string SvnHeadUrl
++        {
++            get { return mSvnHeadUrl; }
++        }
++
++        public string HeadUrl
++        {
++            get
++            {
++                return null;
++            }
++        }
++
++        private string mSvnHeadUrl = null;
++    }
++
++    [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true, Inherited = false)]
++    public class SvnDateAttribute : Attribute
++    {
++        public SvnDateAttribute(string file, string date)
++        {
++            mSvnDate = (string)date.Clone();
++        }
++
++        public string SvnDate
++        {
++            get { return mSvnDate; }
++        }
++
++        public string Date
++        {
++            get
++            {
++                return null;
++            }
++        }
++
++        private string mSvnDate = null;
++    }
++}
+
+
+Property changes on: trunk/OCInterface/SvnAttributes.cs
+___________________________________________________________________
+Name: svn-keywords
+   + Id Date HeadURL Author
+Name: svn:eol-style
+   + native
+
+Added: trunk/OpenClogger/MainForm.Designer.cs
+===================================================================
+--- trunk/OpenClogger/MainForm.Designer.cs	2006-10-22 16:30:54 UTC (rev 2)
++++ trunk/OpenClogger/MainForm.Designer.cs	2006-10-24 18:02:11 UTC (rev 3)
+@@ -0,0 +1,63 @@
++/////////////////////////////////////////////////////////
++//
++// OpenClogger - OpenClogger - MainForm.Designer.cs
++// $Id$
++// $HeadURL$
++//
++// Copyright (c) 2006 OpenClogger Project
++//
++// This file is part of the sources for OpenClogger. It
++// is released under the OpenClogger License. Details of
++// the license can be found in the LICENSE file in the
++// root of the distribution or at the following URL:
++//
++// <A HREF="http://svn.berlios.de/svnroot/repos/openclogger/trunk/LICENSE">http://svn.berlios.de/svnroot/repos/openclogger/trunk/LICENSE</A>
++//
++
++// Subversion version control attributes
++using OCInterface.SvnAttributes;
++[assembly: SvnId(&quot;MainForm.Designer.cs&quot;, &quot;$Id$&quot;)]
++[assembly: SvnRevision(&quot;MainForm.Designer.cs&quot;, &quot;$Revision$&quot;)]
++[assembly: SvnAuthor(&quot;MainForm.Designer.cs&quot;, &quot;$Author$&quot;)]
++[assembly: SvnHeadUrl(&quot;MainForm.Designer.cs&quot;, &quot;$HeadURL$&quot;)]
++[assembly: SvnDate(&quot;MainForm.Designer.cs&quot;, &quot;$Date$&quot;)]
++
++namespace OpenClogger
++{
++    partial class MainForm
++    {
++        /// &lt;summary&gt;
++        /// Required designer variable.
++        /// &lt;/summary&gt;
++        private System.ComponentModel.IContainer components = null;
++
++        /// &lt;summary&gt;
++        /// Clean up any resources being used.
++        /// &lt;/summary&gt;
++        /// &lt;param name=&quot;disposing&quot;&gt;true if managed resources should be disposed; otherwise, false.&lt;/param&gt;
++        protected override void Dispose(bool disposing)
++        {
++            if (disposing &amp;&amp; (components != null))
++            {
++                components.Dispose();
++            }
++            base.Dispose(disposing);
++        }
++
++        #region Windows Form Designer generated code
++
++        /// &lt;summary&gt;
++        /// Required method for Designer support - do not modify
++        /// the contents of this method with the code editor.
++        /// &lt;/summary&gt;
++        private void InitializeComponent()
++        {
++            this.components = new System.ComponentModel.Container();
++            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
++            this.Text = &quot;Form1&quot;;
++        }
++
++        #endregion
++    }
++}
++
+
+
+Property changes on: trunk/OpenClogger/MainForm.Designer.cs
+___________________________________________________________________
+Name: svn-keywords
+   + Id Date HeadURL Author
+Name: svn:eol-style
+   + native
+
+Added: trunk/OpenClogger/MainForm.cs
+===================================================================
+--- trunk/OpenClogger/MainForm.cs	2006-10-22 16:30:54 UTC (rev 2)
++++ trunk/OpenClogger/MainForm.cs	2006-10-24 18:02:11 UTC (rev 3)
+@@ -0,0 +1,43 @@
++/////////////////////////////////////////////////////////
++//
++// OpenClogger - OpenClogger - MainForm.cs
++// $Id$
++// $HeadURL$
++//
++// Copyright (c) 2006 OpenClogger Project
++//
++// This file is part of the sources for OpenClogger. It
++// is released under the OpenClogger License. Details of
++// the license can be found in the LICENSE file in the
++// root of the distribution or at the following URL:
++//
++// <A HREF="http://svn.berlios.de/svnroot/repos/openclogger/trunk/LICENSE">http://svn.berlios.de/svnroot/repos/openclogger/trunk/LICENSE</A>
++//
++
++using System;
++using System.Collections.Generic;
++using System.ComponentModel;
++using System.Data;
++using System.Drawing;
++using System.Text;
++using System.Windows.Forms;
++using OCControls;
++
++// Subversion version control attributes
++using OCInterface.SvnAttributes;
++[assembly: SvnId(&quot;MainForm.cs&quot;, &quot;$Id$&quot;)]
++[assembly: SvnRevision(&quot;MainForm.cs&quot;, &quot;$Revision$&quot;)]
++[assembly: SvnAuthor(&quot;MainForm.cs&quot;, &quot;$Author$&quot;)]
++[assembly: SvnHeadUrl(&quot;MainForm.cs&quot;, &quot;$HeadURL$&quot;)]
++[assembly: SvnDate(&quot;MainForm.cs&quot;, &quot;$Date$&quot;)]
++
++namespace OpenClogger
++{
++    public partial class MainForm : OCForm
++    {
++        public MainForm()
++        {
++            InitializeComponent();
++        }
++    }
++}
+\ No newline at end of file
+
+
+Property changes on: trunk/OpenClogger/MainForm.cs
+___________________________________________________________________
+Name: svn-keywords
+   + Id Date HeadURL Author
+Name: svn:eol-style
+   + native
+
+Added: trunk/OpenClogger/OpenClogger.csproj
+===================================================================
+--- trunk/OpenClogger/OpenClogger.csproj	2006-10-22 16:30:54 UTC (rev 2)
++++ trunk/OpenClogger/OpenClogger.csproj	2006-10-24 18:02:11 UTC (rev 3)
+@@ -0,0 +1,84 @@
++&#65279;&lt;Project DefaultTargets=&quot;Build&quot; xmlns=&quot;<A HREF="http://schemas.microsoft.com/developer/msbuild/2003">http://schemas.microsoft.com/developer/msbuild/2003</A>&quot;&gt;
++  &lt;PropertyGroup&gt;
++    &lt;Configuration Condition=&quot; '$(Configuration)' == '' &quot;&gt;Debug&lt;/Configuration&gt;
++    &lt;Platform Condition=&quot; '$(Platform)' == '' &quot;&gt;AnyCPU&lt;/Platform&gt;
++    &lt;ProductVersion&gt;8.0.50727&lt;/ProductVersion&gt;
++    &lt;SchemaVersion&gt;2.0&lt;/SchemaVersion&gt;
++    &lt;ProjectGuid&gt;{2B4F5D6F-7058-46A9-91F8-6917856BFE85}&lt;/ProjectGuid&gt;
++    &lt;OutputType&gt;WinExe&lt;/OutputType&gt;
++    &lt;AppDesignerFolder&gt;Properties&lt;/AppDesignerFolder&gt;
++    &lt;RootNamespace&gt;OpenClogger&lt;/RootNamespace&gt;
++    &lt;AssemblyName&gt;OpenClogger&lt;/AssemblyName&gt;
++  &lt;/PropertyGroup&gt;
++  &lt;PropertyGroup Condition=&quot; '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' &quot;&gt;
++    &lt;DebugSymbols&gt;true&lt;/DebugSymbols&gt;
++    &lt;DebugType&gt;full&lt;/DebugType&gt;
++    &lt;Optimize&gt;false&lt;/Optimize&gt;
++    &lt;OutputPath&gt;bin\Debug\&lt;/OutputPath&gt;
++    &lt;DefineConstants&gt;DEBUG;TRACE&lt;/DefineConstants&gt;
++    &lt;ErrorReport&gt;prompt&lt;/ErrorReport&gt;
++    &lt;WarningLevel&gt;4&lt;/WarningLevel&gt;
++  &lt;/PropertyGroup&gt;
++  &lt;PropertyGroup Condition=&quot; '$(Configuration)|$(Platform)' == 'Release|AnyCPU' &quot;&gt;
++    &lt;DebugType&gt;pdbonly&lt;/DebugType&gt;
++    &lt;Optimize&gt;true&lt;/Optimize&gt;
++    &lt;OutputPath&gt;bin\Release\&lt;/OutputPath&gt;
++    &lt;DefineConstants&gt;TRACE&lt;/DefineConstants&gt;
++    &lt;ErrorReport&gt;prompt&lt;/ErrorReport&gt;
++    &lt;WarningLevel&gt;4&lt;/WarningLevel&gt;
++  &lt;/PropertyGroup&gt;
++  &lt;ItemGroup&gt;
++    &lt;Reference Include=&quot;System&quot; /&gt;
++    &lt;Reference Include=&quot;System.Data&quot; /&gt;
++    &lt;Reference Include=&quot;System.Deployment&quot; /&gt;
++    &lt;Reference Include=&quot;System.Drawing&quot; /&gt;
++    &lt;Reference Include=&quot;System.Windows.Forms&quot; /&gt;
++    &lt;Reference Include=&quot;System.Xml&quot; /&gt;
++  &lt;/ItemGroup&gt;
++  &lt;ItemGroup&gt;
++    &lt;Compile Include=&quot;MainForm.cs&quot;&gt;
++      &lt;SubType&gt;Form&lt;/SubType&gt;
++    &lt;/Compile&gt;
++    &lt;Compile Include=&quot;MainForm.Designer.cs&quot;&gt;
++      &lt;DependentUpon&gt;MainForm.cs&lt;/DependentUpon&gt;
++    &lt;/Compile&gt;
++    &lt;Compile Include=&quot;Program.cs&quot; /&gt;
++    &lt;Compile Include=&quot;Properties\AssemblyInfo.cs&quot; /&gt;
++    &lt;EmbeddedResource Include=&quot;Properties\Resources.resx&quot;&gt;
++      &lt;Generator&gt;ResXFileCodeGenerator&lt;/Generator&gt;
++      &lt;LastGenOutput&gt;Resources.Designer.cs&lt;/LastGenOutput&gt;
++      &lt;SubType&gt;Designer&lt;/SubType&gt;
++    &lt;/EmbeddedResource&gt;
++    &lt;Compile Include=&quot;Properties\Resources.Designer.cs&quot;&gt;
++      &lt;AutoGen&gt;True&lt;/AutoGen&gt;
++      &lt;DependentUpon&gt;Resources.resx&lt;/DependentUpon&gt;
++    &lt;/Compile&gt;
++    &lt;None Include=&quot;Properties\Settings.settings&quot;&gt;
++      &lt;Generator&gt;SettingsSingleFileGenerator&lt;/Generator&gt;
++      &lt;LastGenOutput&gt;Settings.Designer.cs&lt;/LastGenOutput&gt;
++    &lt;/None&gt;
++    &lt;Compile Include=&quot;Properties\Settings.Designer.cs&quot;&gt;
++      &lt;AutoGen&gt;True&lt;/AutoGen&gt;
++      &lt;DependentUpon&gt;Settings.settings&lt;/DependentUpon&gt;
++      &lt;DesignTimeSharedInput&gt;True&lt;/DesignTimeSharedInput&gt;
++    &lt;/Compile&gt;
++  &lt;/ItemGroup&gt;
++  &lt;ItemGroup&gt;
++    &lt;ProjectReference Include=&quot;..\OCControls\OCControls.csproj&quot;&gt;
++      &lt;Project&gt;{66061D7E-5174-4681-868C-09BFA6C6A7E3}&lt;/Project&gt;
++      &lt;Name&gt;OCControls&lt;/Name&gt;
++    &lt;/ProjectReference&gt;
++    &lt;ProjectReference Include=&quot;..\OCInterface\OCInterface.csproj&quot;&gt;
++      &lt;Project&gt;{53D9195E-244C-4C9A-B0C1-B682FA70C00A}&lt;/Project&gt;
++      &lt;Name&gt;OCInterface&lt;/Name&gt;
++    &lt;/ProjectReference&gt;
++  &lt;/ItemGroup&gt;
++  &lt;Import Project=&quot;$(MSBuildBinPath)\Microsoft.CSharp.targets&quot; /&gt;
++  &lt;!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
++       Other similar extension points exist, see Microsoft.Common.targets.
++  &lt;Target Name=&quot;BeforeBuild&quot;&gt;
++  &lt;/Target&gt;
++  &lt;Target Name=&quot;AfterBuild&quot;&gt;
++  &lt;/Target&gt;
++  --&gt;
++&lt;/Project&gt;
+\ No newline at end of file
+
+
+Property changes on: trunk/OpenClogger/OpenClogger.csproj
+___________________________________________________________________
+Name: svn:needs-lock
+   + *
+Name: svn:eol-style
+   + CRLF
+
+Added: trunk/OpenClogger/Program.cs
+===================================================================
+--- trunk/OpenClogger/Program.cs	2006-10-22 16:30:54 UTC (rev 2)
++++ trunk/OpenClogger/Program.cs	2006-10-24 18:02:11 UTC (rev 3)
+@@ -0,0 +1,44 @@
++/////////////////////////////////////////////////////////
++//
++// OpenClogger - OpenClogger - Program.cs
++// $Id$
++// $HeadURL$
++//
++// Copyright (c) 2006 OpenClogger Project
++//
++// This file is part of the sources for OpenClogger. It
++// is released under the OpenClogger License. Details of
++// the license can be found in the LICENSE file in the
++// root of the distribution or at the following URL:
++//
++// <A HREF="http://svn.berlios.de/svnroot/repos/openclogger/trunk/LICENSE">http://svn.berlios.de/svnroot/repos/openclogger/trunk/LICENSE</A>
++//
++
++using System;
++using System.Collections.Generic;
++using System.Windows.Forms;
++
++// Subversion version control attributes
++using OCInterface.SvnAttributes;
++[assembly: SvnId(&quot;Program.cs&quot;, &quot;$Id$&quot;)]
++[assembly: SvnRevision(&quot;Program.cs&quot;, &quot;$Revision$&quot;)]
++[assembly: SvnAuthor(&quot;Program.cs&quot;, &quot;$Author$&quot;)]
++[assembly: SvnHeadUrl(&quot;Program.cs&quot;, &quot;$HeadURL$&quot;)]
++[assembly: SvnDate(&quot;Program.cs&quot;, &quot;$Date$&quot;)]
++
++namespace OpenClogger
++{
++    static class Program
++    {
++        /// &lt;summary&gt;
++        /// The main entry point for the application.
++        /// &lt;/summary&gt;
++        [STAThread]
++        static void Main()
++        {
++            Application.EnableVisualStyles();
++            Application.SetCompatibleTextRenderingDefault(false);
++            Application.Run(new MainForm());
++        }
++    }
++}
+\ No newline at end of file
+
+
+Property changes on: trunk/OpenClogger/Program.cs
+___________________________________________________________________
+Name: svn-keywords
+   + Id Date HeadURL Author
+Name: svn:eol-style
+   + native
+
+Added: trunk/OpenClogger/Properties/AssemblyInfo.cs
+===================================================================
+--- trunk/OpenClogger/Properties/AssemblyInfo.cs	2006-10-22 16:30:54 UTC (rev 2)
++++ trunk/OpenClogger/Properties/AssemblyInfo.cs	2006-10-24 18:02:11 UTC (rev 3)
+@@ -0,0 +1,62 @@
++&#65279;/////////////////////////////////////////////////////////
++//
++// OpenClogger - OpenClogger - AssemblyInfo.cs
++// $Id$
++// $HeadURL$
++//
++// Copyright (c) 2006 OpenClogger Project
++//
++// This file is part of the sources for OpenClogger. It
++// is released under the OpenClogger License. Details of
++// the license can be found in the LICENSE file in the
++// root of the distribution or at the following URL:
++//
++// <A HREF="http://svn.berlios.de/svnroot/repos/openclogger/trunk/LICENSE">http://svn.berlios.de/svnroot/repos/openclogger/trunk/LICENSE</A>
++//
++
++using System;
++using System.Reflection;
++using System.Runtime.CompilerServices;
++using System.Runtime.InteropServices;
++using OCInterface.SvnAttributes;
++
++// General Information about an assembly is controlled through the following 
++// set of attributes. Change these attribute values to modify the information
++// associated with an assembly.
++[assembly: AssemblyTitle(&quot;OpenClogger&quot;)]
++[assembly: AssemblyDescription(&quot;&quot;)]
++[assembly: AssemblyConfiguration(&quot;&quot;)]
++[assembly: AssemblyCompany(&quot;OpenClogger Project&quot;)]
++[assembly: AssemblyProduct(&quot;OpenClogger&quot;)]
++[assembly: AssemblyCopyright(&quot;Copyright &#169; 2006 OpenClogger Project&quot;)]
++[assembly: AssemblyTrademark(&quot;&quot;)]
++[assembly: AssemblyCulture(&quot;&quot;)]
++
++// Assemblies should all be CLS compliant.
++[assembly: CLSCompliant(true)]
++
++// Setting ComVisible to false makes the types in this assembly not visible 
++// to COM components.  If you need to access a type in this assembly from 
++// COM, set the ComVisible attribute to true on that type.
++[assembly: ComVisible(false)]
++
++// The following GUID is for the ID of the typelib if this project is exposed to COM
++[assembly: Guid(&quot;77165aee-8288-490b-8aad-249b23b11d22&quot;)]
++
++// Version information for an assembly consists of the following four values:
++//
++//      Major Version
++//      Minor Version 
++//      Build Number
++//      Revision
++//
++// You can specify all the values or you can default the Revision and Build Numbers 
++// by using the '*' as shown below:
++[assembly: AssemblyVersion(&quot;0.0.1.0&quot;)]
++[assembly: AssemblyFileVersion(&quot;0.0.1.0&quot;)]
++[assembly: AssemblyInformationalVersion(&quot;0.0.1.0&quot;)]
++
++// Subversion version control attributes
++[assembly: SvnId(&quot;AssemblyInfo.cs&quot;, &quot;$Id$&quot;)]
++[assembly: SvnRevision(&quot;AssemblyInfo.cs&quot;, &quot;$Revision$&quot;)]
++[assembly: SvnAuthor(&quot;AssemblyInfo.cs&quot;, &quot;$Author$&quot;)]
+\ No newline at end of file
+
+
+Property changes on: trunk/OpenClogger/Properties/AssemblyInfo.cs
+___________________________________________________________________
+Name: svn-keywords
+   + Id Date HeadURL Author
+Name: svn:eol-style
+   + native
+
+Added: trunk/OpenClogger/Properties/Resources.Designer.cs
+===================================================================
+--- trunk/OpenClogger/Properties/Resources.Designer.cs	2006-10-22 16:30:54 UTC (rev 2)
++++ trunk/OpenClogger/Properties/Resources.Designer.cs	2006-10-24 18:02:11 UTC (rev 3)
+@@ -0,0 +1,71 @@
++&#65279;//------------------------------------------------------------------------------
++// &lt;auto-generated&gt;
++//     This code was generated by a tool.
++//     Runtime Version:2.0.50727.42
++//
++//     Changes to this file may cause incorrect behavior and will be lost if
++//     the code is regenerated.
++// &lt;/auto-generated&gt;
++//------------------------------------------------------------------------------
++
++namespace OpenClogger.Properties
++{
++
++
++    /// &lt;summary&gt;
++    ///   A strongly-typed resource class, for looking up localized strings, etc.
++    /// &lt;/summary&gt;
++    // This class was auto-generated by the StronglyTypedResourceBuilder
++    // class via a tool like ResGen or Visual Studio.
++    // To add or remove a member, edit your .ResX file then rerun ResGen
++    // with the /str option, or rebuild your VS project.
++    [global::System.CodeDom.Compiler.GeneratedCodeAttribute(&quot;System.Resources.Tools.StronglyTypedResourceBuilder&quot;, &quot;2.0.0.0&quot;)]
++    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
++    [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
++    internal class Resources
++    {
++
++        private static global::System.Resources.ResourceManager resourceMan;
++
++        private static global::System.Globalization.CultureInfo resourceCulture;
++
++        [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(&quot;Microsoft.Performance&quot;, &quot;CA1811:AvoidUncalledPrivateCode&quot;)]
++        internal Resources()
++        {
++        }
++
++        /// &lt;summary&gt;
++        ///   Returns the cached ResourceManager instance used by this class.
++        /// &lt;/summary&gt;
++        [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
++        internal static global::System.Resources.ResourceManager ResourceManager
++        {
++            get
++            {
++                if ((resourceMan == null))
++                {
++                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager(&quot;OpenClogger.Properties.Resources&quot;, typeof(Resources).Assembly);
++                    resourceMan = temp;
++                }
++                return resourceMan;
++            }
++        }
++
++        /// &lt;summary&gt;
++        ///   Overrides the current thread's CurrentUICulture property for all
++        ///   resource lookups using this strongly typed resource class.
++        /// &lt;/summary&gt;
++        [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
++        internal static global::System.Globalization.CultureInfo Culture
++        {
++            get
++            {
++                return resourceCulture;
++            }
++            set
++            {
++                resourceCulture = value;
++            }
++        }
++    }
++}
+
+
+Property changes on: trunk/OpenClogger/Properties/Resources.Designer.cs
+___________________________________________________________________
+Name: svn-keywords
+   + Id Date HeadURL Author
+Name: svn:eol-style
+   + native
+
+Added: trunk/OpenClogger/Properties/Resources.resx
+===================================================================
+--- trunk/OpenClogger/Properties/Resources.resx	2006-10-22 16:30:54 UTC (rev 2)
++++ trunk/OpenClogger/Properties/Resources.resx	2006-10-24 18:02:11 UTC (rev 3)
+@@ -0,0 +1,117 @@
++&#65279;&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
++&lt;root&gt;
++  &lt;!-- 
++    Microsoft ResX Schema 
++    
++    Version 2.0
++    
++    The primary goals of this format is to allow a simple XML format 
++    that is mostly human readable. The generation and parsing of the 
++    various data types are done through the TypeConverter classes 
++    associated with the data types.
++    
++    Example:
++    
++    ... ado.net/XML headers &amp; schema ...
++    &lt;resheader name=&quot;resmimetype&quot;&gt;text/microsoft-resx&lt;/resheader&gt;
++    &lt;resheader name=&quot;version&quot;&gt;2.0&lt;/resheader&gt;
++    &lt;resheader name=&quot;reader&quot;&gt;System.Resources.ResXResourceReader, System.Windows.Forms, ...&lt;/resheader&gt;
++    &lt;resheader name=&quot;writer&quot;&gt;System.Resources.ResXResourceWriter, System.Windows.Forms, ...&lt;/resheader&gt;
++    &lt;data name=&quot;Name1&quot;&gt;&lt;value&gt;this is my long string&lt;/value&gt;&lt;comment&gt;this is a comment&lt;/comment&gt;&lt;/data&gt;
++    &lt;data name=&quot;Color1&quot; type=&quot;System.Drawing.Color, System.Drawing&quot;&gt;Blue&lt;/data&gt;
++    &lt;data name=&quot;Bitmap1&quot; mimetype=&quot;application/x-microsoft.net.object.binary.base64&quot;&gt;
++        &lt;value&gt;[base64 mime encoded serialized .NET Framework object]&lt;/value&gt;
++    &lt;/data&gt;
++    &lt;data name=&quot;Icon1&quot; type=&quot;System.Drawing.Icon, System.Drawing&quot; mimetype=&quot;application/x-microsoft.net.object.bytearray.base64&quot;&gt;
++        &lt;value&gt;[base64 mime encoded string representing a byte array form of the .NET Framework object]&lt;/value&gt;
++        &lt;comment&gt;This is a comment&lt;/comment&gt;
++    &lt;/data&gt;
++                
++    There are any number of &quot;resheader&quot; rows that contain simple 
++    name/value pairs.
++    
++    Each data row contains a name, and value. The row also contains a 
++    type or mimetype. Type corresponds to a .NET class that support 
++    text/value conversion through the TypeConverter architecture. 
++    Classes that don't support this are serialized and stored with the 
++    mimetype set.
++    
++    The mimetype is used for serialized objects, and tells the 
++    ResXResourceReader how to depersist the object. This is currently not 
++    extensible. For a given mimetype the value must be set accordingly:
++    
++    Note - application/x-microsoft.net.object.binary.base64 is the format 
++    that the ResXResourceWriter will generate, however the reader can 
++    read any of the formats listed below.
++    
++    mimetype: application/x-microsoft.net.object.binary.base64
++    value   : The object must be serialized with 
++            : System.Serialization.Formatters.Binary.BinaryFormatter
++            : and then encoded with base64 encoding.
++    
++    mimetype: application/x-microsoft.net.object.soap.base64
++    value   : The object must be serialized with 
++            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
++            : and then encoded with base64 encoding.
++
++    mimetype: application/x-microsoft.net.object.bytearray.base64
++    value   : The object must be serialized into a byte array 
++            : using a System.ComponentModel.TypeConverter
++            : and then encoded with base64 encoding.
++    --&gt;
++  &lt;xsd:schema id=&quot;root&quot; xmlns=&quot;&quot; xmlns:xsd=&quot;<A HREF="http://www.w3.org/2001/XMLSchema">http://www.w3.org/2001/XMLSchema</A>&quot; xmlns:msdata=&quot;urn:schemas-microsoft-com:xml-msdata&quot;&gt;
++    &lt;xsd:element name=&quot;root&quot; msdata:IsDataSet=&quot;true&quot;&gt;
++      &lt;xsd:complexType&gt;
++        &lt;xsd:choice maxOccurs=&quot;unbounded&quot;&gt;
++          &lt;xsd:element name=&quot;metadata&quot;&gt;
++            &lt;xsd:complexType&gt;
++              &lt;xsd:sequence&gt;
++                &lt;xsd:element name=&quot;value&quot; type=&quot;xsd:string&quot; minOccurs=&quot;0&quot; /&gt;
++              &lt;/xsd:sequence&gt;
++              &lt;xsd:attribute name=&quot;name&quot; type=&quot;xsd:string&quot; /&gt;
++              &lt;xsd:attribute name=&quot;type&quot; type=&quot;xsd:string&quot; /&gt;
++              &lt;xsd:attribute name=&quot;mimetype&quot; type=&quot;xsd:string&quot; /&gt;
++            &lt;/xsd:complexType&gt;
++          &lt;/xsd:element&gt;
++          &lt;xsd:element name=&quot;assembly&quot;&gt;
++            &lt;xsd:complexType&gt;
++              &lt;xsd:attribute name=&quot;alias&quot; type=&quot;xsd:string&quot; /&gt;
++              &lt;xsd:attribute name=&quot;name&quot; type=&quot;xsd:string&quot; /&gt;
++            &lt;/xsd:complexType&gt;
++          &lt;/xsd:element&gt;
++          &lt;xsd:element name=&quot;data&quot;&gt;
++            &lt;xsd:complexType&gt;
++              &lt;xsd:sequence&gt;
++                &lt;xsd:element name=&quot;value&quot; type=&quot;xsd:string&quot; minOccurs=&quot;0&quot; msdata:Ordinal=&quot;1&quot; /&gt;
++                &lt;xsd:element name=&quot;comment&quot; type=&quot;xsd:string&quot; minOccurs=&quot;0&quot; msdata:Ordinal=&quot;2&quot; /&gt;
++              &lt;/xsd:sequence&gt;
++              &lt;xsd:attribute name=&quot;name&quot; type=&quot;xsd:string&quot; msdata:Ordinal=&quot;1&quot; /&gt;
++              &lt;xsd:attribute name=&quot;type&quot; type=&quot;xsd:string&quot; msdata:Ordinal=&quot;3&quot; /&gt;
++              &lt;xsd:attribute name=&quot;mimetype&quot; type=&quot;xsd:string&quot; msdata:Ordinal=&quot;4&quot; /&gt;
++            &lt;/xsd:complexType&gt;
++          &lt;/xsd:element&gt;
++          &lt;xsd:element name=&quot;resheader&quot;&gt;
++            &lt;xsd:complexType&gt;
++              &lt;xsd:sequence&gt;
++                &lt;xsd:element name=&quot;value&quot; type=&quot;xsd:string&quot; minOccurs=&quot;0&quot; msdata:Ordinal=&quot;1&quot; /&gt;
++              &lt;/xsd:sequence&gt;
++              &lt;xsd:attribute name=&quot;name&quot; type=&quot;xsd:string&quot; use=&quot;required&quot; /&gt;
++            &lt;/xsd:complexType&gt;
++          &lt;/xsd:element&gt;
++        &lt;/xsd:choice&gt;
++      &lt;/xsd:complexType&gt;
++    &lt;/xsd:element&gt;
++  &lt;/xsd:schema&gt;
++  &lt;resheader name=&quot;resmimetype&quot;&gt;
++    &lt;value&gt;text/microsoft-resx&lt;/value&gt;
++  &lt;/resheader&gt;
++  &lt;resheader name=&quot;version&quot;&gt;
++    &lt;value&gt;2.0&lt;/value&gt;
++  &lt;/resheader&gt;
++  &lt;resheader name=&quot;reader&quot;&gt;
++    &lt;value&gt;System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089&lt;/value&gt;
++  &lt;/resheader&gt;
++  &lt;resheader name=&quot;writer&quot;&gt;
++    &lt;value&gt;System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089&lt;/value&gt;
++  &lt;/resheader&gt;
++&lt;/root&gt;
+\ No newline at end of file
+
+Added: trunk/OpenClogger/Properties/Settings.Designer.cs
+===================================================================
+--- trunk/OpenClogger/Properties/Settings.Designer.cs	2006-10-22 16:30:54 UTC (rev 2)
++++ trunk/OpenClogger/Properties/Settings.Designer.cs	2006-10-24 18:02:11 UTC (rev 3)
+@@ -0,0 +1,30 @@
++&#65279;//------------------------------------------------------------------------------
++// &lt;auto-generated&gt;
++//     This code was generated by a tool.
++//     Runtime Version:2.0.50727.42
++//
++//     Changes to this file may cause incorrect behavior and will be lost if
++//     the code is regenerated.
++// &lt;/auto-generated&gt;
++//------------------------------------------------------------------------------
++
++namespace OpenClogger.Properties
++{
++
++
++    [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
++    [global::System.CodeDom.Compiler.GeneratedCodeAttribute(&quot;Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator&quot;, &quot;8.0.0.0&quot;)]
++    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase
++    {
++
++        private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
++
++        public static Settings Default
++        {
++            get
++            {
++                return defaultInstance;
++            }
++        }
++    }
++}
+
+
+Property changes on: trunk/OpenClogger/Properties/Settings.Designer.cs
+___________________________________________________________________
+Name: svn-keywords
+   + Id Date HeadURL Author
+Name: svn:eol-style
+   + native
+
+Added: trunk/OpenClogger/Properties/Settings.settings
+===================================================================
+--- trunk/OpenClogger/Properties/Settings.settings	2006-10-22 16:30:54 UTC (rev 2)
++++ trunk/OpenClogger/Properties/Settings.settings	2006-10-24 18:02:11 UTC (rev 3)
+@@ -0,0 +1,7 @@
++&#65279;&lt;?xml version='1.0' encoding='utf-8'?&gt;
++&lt;SettingsFile xmlns=&quot;<A HREF="http://schemas.microsoft.com/VisualStudio/2004/01/settings">http://schemas.microsoft.com/VisualStudio/2004/01/settings</A>&quot; CurrentProfile=&quot;(Default)&quot;&gt;
++  &lt;Profiles&gt;
++    &lt;Profile Name=&quot;(Default)&quot; /&gt;
++  &lt;/Profiles&gt;
++  &lt;Settings /&gt;
++&lt;/SettingsFile&gt;
+
+Added: trunk/OpenClogger.sln
+===================================================================
+--- trunk/OpenClogger.sln	2006-10-22 16:30:54 UTC (rev 2)
++++ trunk/OpenClogger.sln	2006-10-24 18:02:11 UTC (rev 3)
+@@ -0,0 +1,32 @@
++&#65279;
++Microsoft Visual Studio Solution File, Format Version 9.00
++# Visual C# Express 2005
++Project(&quot;{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}&quot;) = &quot;OpenClogger&quot;, &quot;OpenClogger\OpenClogger.csproj&quot;, &quot;{2B4F5D6F-7058-46A9-91F8-6917856BFE85}&quot;
++EndProject
++Project(&quot;{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}&quot;) = &quot;OCInterface&quot;, &quot;OCInterface\OCInterface.csproj&quot;, &quot;{53D9195E-244C-4C9A-B0C1-B682FA70C00A}&quot;
++EndProject
++Project(&quot;{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}&quot;) = &quot;OCControls&quot;, &quot;OCControls\OCControls.csproj&quot;, &quot;{66061D7E-5174-4681-868C-09BFA6C6A7E3}&quot;
++EndProject
++Global
++	GlobalSection(SolutionConfigurationPlatforms) = preSolution
++		Debug|Any CPU = Debug|Any CPU
++		Release|Any CPU = Release|Any CPU
++	EndGlobalSection
++	GlobalSection(ProjectConfigurationPlatforms) = postSolution
++		{2B4F5D6F-7058-46A9-91F8-6917856BFE85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
++		{2B4F5D6F-7058-46A9-91F8-6917856BFE85}.Debug|Any CPU.Build.0 = Debug|Any CPU
++		{2B4F5D6F-7058-46A9-91F8-6917856BFE85}.Release|Any CPU.ActiveCfg = Release|Any CPU
++		{2B4F5D6F-7058-46A9-91F8-6917856BFE85}.Release|Any CPU.Build.0 = Release|Any CPU
++		{53D9195E-244C-4C9A-B0C1-B682FA70C00A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
++		{53D9195E-244C-4C9A-B0C1-B682FA70C00A}.Debug|Any CPU.Build.0 = Debug|Any CPU
++		{53D9195E-244C-4C9A-B0C1-B682FA70C00A}.Release|Any CPU.ActiveCfg = Release|Any CPU
++		{53D9195E-244C-4C9A-B0C1-B682FA70C00A}.Release|Any CPU.Build.0 = Release|Any CPU
++		{66061D7E-5174-4681-868C-09BFA6C6A7E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
++		{66061D7E-5174-4681-868C-09BFA6C6A7E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
++		{66061D7E-5174-4681-868C-09BFA6C6A7E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
++		{66061D7E-5174-4681-868C-09BFA6C6A7E3}.Release|Any CPU.Build.0 = Release|Any CPU
++	EndGlobalSection
++	GlobalSection(SolutionProperties) = preSolution
++		HideSolutionNode = FALSE
++	EndGlobalSection
++EndGlobal
+
+
+Property changes on: trunk/OpenClogger.sln
+___________________________________________________________________
+Name: svn:needs-lock
+   + *
+Name: svn:eol-style
+   + CRLF
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000001.html">[Openclogger-svn] r2 - /
+</A></li>
+	<LI>Next message: <A HREF="000003.html">[Openclogger-svn] r4 - in trunk: OCControls OCControls/Properties	OCInterface OCInterface/Properties OpenClogger	OpenClogger/Properties
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#2">[ date ]</a>
+              <a href="thread.html#2">[ thread ]</a>
+              <a href="subject.html#2">[ subject ]</a>
+              <a href="author.html#2">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/openclogger-svn">More information about the Openclogger-svn
+mailing list</a><br>
+</body></html>

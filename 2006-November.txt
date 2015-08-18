@@ -1,0 +1,3301 @@
+From openclogger-svn at lists.berlios.de  Sun Nov 12 12:47:38 2006
+From: openclogger-svn at lists.berlios.de (openclogger-svn at lists.berlios.de)
+Date: Sun, 12 Nov 2006 12:47:38 +0100
+Subject: [Openclogger-svn] r8 - in trunk: OCControls OCControls/Properties
+	OCInterface OCInterface/Properties OpenClogger
+	OpenClogger/Properties OpenClogger/icons
+Message-ID: <200611121147.kACBlcdZ016108@sheep.berlios.de>
+
+Author: nkilzer
+Date: 2006-11-12 12:47:01 +0100 (Sun, 12 Nov 2006)
+New Revision: 8
+
+Added:
+   trunk/OCControls/IPaintBackground.cs
+   trunk/OCControls/OCLinkLabel.cs
+   trunk/OCControls/OCPictureBox.cs
+   trunk/OCControls/OCSkinManager.cs
+   trunk/OCControls/OCTabControl.cs
+   trunk/OCControls/OCTabPage.cs
+   trunk/OCControls/OCTooltipForm.cs
+   trunk/OCControls/OCTooltipForm.resx
+   trunk/OCInterface/AboutForm.Designer.cs
+   trunk/OCInterface/AboutForm.cs
+   trunk/OCInterface/AboutForm.resx
+   trunk/OCInterface/OpenCloggerAttributes.cs
+   trunk/OpenClogger/MainForm.resx
+   trunk/OpenClogger/Settings.cs
+   trunk/OpenClogger/icons/
+   trunk/OpenClogger/icons/asm_large.ico
+   trunk/OpenClogger/icons/asm_small.ico
+   trunk/OpenClogger/icons/c_large.ico
+   trunk/OpenClogger/icons/c_small.ico
+   trunk/OpenClogger/icons/cpp_large.ico
+   trunk/OpenClogger/icons/cpp_small.ico
+   trunk/OpenClogger/icons/csharp_large.ico
+   trunk/OpenClogger/icons/csharp_small.ico
+   trunk/OpenClogger/icons/h_large.ico
+   trunk/OpenClogger/icons/h_small.ico
+   trunk/OpenClogger/vs_logo.png
+
+Modified:
+   trunk/OCControls/OCButton.cs
+   trunk/OCControls/OCControls.csproj
+   trunk/OCControls/OCForm.cs
+   trunk/OCControls/OCLabel.cs
+   trunk/OCControls/Properties/AssemblyInfo.cs
+   trunk/OCInterface/OCInterface.csproj
+   trunk/OCInterface/Properties/AssemblyInfo.cs
+   trunk/OCInterface/SvnAttributes.cs
+   trunk/OpenClogger/MainForm.Designer.cs
+   trunk/OpenClogger/MainForm.cs
+   trunk/OpenClogger/OpenClogger.csproj
+   trunk/OpenClogger/Program.cs
+   trunk/OpenClogger/Properties/AssemblyInfo.cs
+   trunk/OpenClogger/Properties/Resources.Designer.cs
+   trunk/OpenClogger/Properties/Resources.resx
+
+Log:
+This will probably break the tree, but it will still build.
+
+Added: trunk/OCControls/IPaintBackground.cs
+===================================================================
+--- trunk/OCControls/IPaintBackground.cs	2006-10-24 18:40:46 UTC (rev 7)
++++ trunk/OCControls/IPaintBackground.cs	2006-11-12 11:47:01 UTC (rev 8)
+@@ -0,0 +1,32 @@
++/////////////////////////////////////////////////////////////////////////////////////////////////////////////
++//
++// OpenClogger - OCControls - OCButton.cs
++// $Id$
++// $HeadURL$
++//
++// Copyright (c) 2006 OpenClogger Project
++//
++// This file is part of the sources for OpenClogger. It
++// is released under the OpenClogger License. Details of
++// the license can be found in the LICENSE file in the
++// root of the distribution or at the following URL:
++//
++// http://svn.berlios.de/svnroot/repos/openclogger/trunk/LICENSE
++//
++
++using System;
++using System.Windows.Forms;
++
++// Subversion version control attributes
++using OCInterface.SvnAttributes;
++[assembly: SvnId( "$Id$" )]
++[assembly: SvnHeadUrl( "$HeadURL$" )]
++
++namespace OCControls
++{
++    public interface IPaintBackground
++    {
++        event PaintEventHandler PaintBackground;
++        Control GetOCParentControl( );
++    }
++}
+
+
+Property changes on: trunk/OCControls/IPaintBackground.cs
+___________________________________________________________________
+Name: svn:keywords
+   + Id Date HeadURL Author Revision
+Name: svn:eol-style
+   + native
+
+Modified: trunk/OCControls/OCButton.cs
+===================================================================
+--- trunk/OCControls/OCButton.cs	2006-10-24 18:40:46 UTC (rev 7)
++++ trunk/OCControls/OCButton.cs	2006-11-12 11:47:01 UTC (rev 8)
+@@ -24,15 +24,30 @@
+ 
+ // Subversion version control attributes
+ using OCInterface.SvnAttributes;
+-[assembly: SvnId("OCButton.cs", "$Id$")]
+-[assembly: SvnRevision("OCButton.cs", "$Revision$")]
+-[assembly: SvnAuthor("OCButton.cs", "$Author$")]
+-[assembly: SvnHeadUrl("OCButton.cs", "$HeadURL$")]
+-[assembly: SvnDate("OCButton.cs", "$Date$")]
++[assembly: SvnId("$Id$")]
++[assembly: SvnHeadUrl("$HeadURL$")]
+ 
+ namespace OCControls
+ {
+-    public partial class OCButton : Button
++    public partial class OCButton : Button, IPaintBackground 
+     {
++        public event PaintEventHandler PaintBackground;
++        protected override void OnPaintBackground( PaintEventArgs pevent )
++        {
++            if ( PaintBackground != null )
++            {
++                PaintBackground( this, pevent );
++            }
++        }
++
++        public Control GetOCParentControl( )
++        {
++            Control result = this;
++            if ( Parent is IPaintBackground )
++            {
++                result = ( (IPaintBackground)Parent ).GetOCParentControl();
++            }
++            return result;
++        }
+     }
+ }
+
+Modified: trunk/OCControls/OCControls.csproj
+===================================================================
+--- trunk/OCControls/OCControls.csproj	2006-10-24 18:40:46 UTC (rev 7)
++++ trunk/OCControls/OCControls.csproj	2006-11-12 11:47:01 UTC (rev 8)
+@@ -35,6 +35,7 @@
+     <Reference Include="System.Xml" />
+   </ItemGroup>
+   <ItemGroup>
++    <Compile Include="IPaintBackground.cs" />
+     <Compile Include="OCButton.cs">
+       <SubType>Component</SubType>
+     </Compile>
+@@ -44,6 +45,22 @@
+     <Compile Include="OCLabel.cs">
+       <SubType>Component</SubType>
+     </Compile>
++    <Compile Include="OCLinkLabel.cs">
++      <SubType>Component</SubType>
++    </Compile>
++    <Compile Include="OCPictureBox.cs">
++      <SubType>Component</SubType>
++    </Compile>
++    <Compile Include="OCSkinManager.cs" />
++    <Compile Include="OCTabControl.cs">
++      <SubType>Component</SubType>
++    </Compile>
++    <Compile Include="OCTabPage.cs">
++      <SubType>Component</SubType>
++    </Compile>
++    <Compile Include="OCTooltipForm.cs">
++      <SubType>Form</SubType>
++    </Compile>
+     <Compile Include="Properties\AssemblyInfo.cs" />
+   </ItemGroup>
+   <ItemGroup>
+@@ -52,6 +69,12 @@
+       <Name>OCInterface</Name>
+     </ProjectReference>
+   </ItemGroup>
++  <ItemGroup>
++    <EmbeddedResource Include="OCTooltipForm.resx">
++      <SubType>Designer</SubType>
++      <DependentUpon>OCTooltipForm.cs</DependentUpon>
++    </EmbeddedResource>
++  </ItemGroup>
+   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+        Other similar extension points exist, see Microsoft.Common.targets.
+
+Modified: trunk/OCControls/OCForm.cs
+===================================================================
+--- trunk/OCControls/OCForm.cs	2006-10-24 18:40:46 UTC (rev 7)
++++ trunk/OCControls/OCForm.cs	2006-11-12 11:47:01 UTC (rev 8)
+@@ -18,21 +18,129 @@
+ using System.Collections.Generic;
+ using System.ComponentModel;
+ using System.Drawing;
++using System.Drawing.Drawing2D;
+ using System.Data;
+ using System.Text;
+ using System.Windows.Forms;
++using System.Windows.Forms.Design;
+ 
+ // Subversion version control attributes
+ using OCInterface.SvnAttributes;
+-[assembly: SvnId("OCForm.cs", "$Id$")]
+-[assembly: SvnRevision("OCForm.cs", "$Revision$")]
+-[assembly: SvnAuthor("OCForm.cs", "$Author$")]
+-[assembly: SvnHeadUrl("OCForm.cs", "$HeadURL$")]
+-[assembly: SvnDate("OCForm.cs", "$Date$")]
++[assembly: SvnId("$Id$")]
++[assembly: SvnHeadUrl("$HeadURL$")]
+ 
+ namespace OCControls
+ {
+-    public partial class OCForm : Form
++    public partial class OCForm : Form, IPaintBackground
+     {
++        public OCForm( )
++        {
++        }
++
++        public event PaintEventHandler PaintBackground;
++        protected override void OnPaintBackground( PaintEventArgs pevent )
++        {
++            if ( PaintBackground != null )
++            {
++                PaintBackground( this, pevent );
++            }
++        }
++
++        public Control GetOCParentControl( )
++        {
++            Control result = this;
++            if ( Parent is IPaintBackground )
++            {
++                result = ( (IPaintBackground)Parent ).GetOCParentControl();
++            }
++            return result;
++        }
++
++        /*
++        protected override void OnPaintBackground( PaintEventArgs e )
++        {
++            base.OnPaintBackground( e );
++
++            LinearGradientBrush brush = new LinearGradientBrush( this.ClientRectangle, SystemColors.Control, Color.White, 90.0F, true );
++            e.Graphics.FillRectangle( brush, this.ClientRectangle );
++        }
++
++        [DefaultValue(1000),Description("Delay for the form to become full opaque or transparent (ms)")]
++        [Category("Appearance")]
++        public int OpacityDelay
++        {
++            get
++            {
++                return mOpacityDelay;
++            }
++            set
++            {
++                mOpacityDelay = value;
++                if ( mOpacityDelay > 0 )
++                {
++                    this.AllowTransparency = true;
++                }
++                else
++                {
++                    this.AllowTransparency = false;
++                }
++            }
++        }
++
++        protected override void OnLoad( EventArgs e )
++        {
++            base.OnLoad( e );
++            Opacity = 0.0;
++            StartOpacityTimer( 1 );
++        }
++
++        protected override void OnClosing( CancelEventArgs e )
++        {
++            base.OnClosing( e );
++
++            if ( !e.Cancel )
++            {
++                StartOpacityTimer( -1 );
++                if ( this.Opacity > 0.01 )
++                {
++                    e.Cancel = true;
++                }
++            }
++        }
++
++        private void StartOpacityTimer( int step )
++        {
++            if ( ( mOpacityDelay > 0 ) && ( null == mOpacityTimer ) )
++            {
++                this.Enabled = false;
++                mOpacityDirection = step;
++                mOpacityTimer = new Timer();
++                mOpacityTimer.Interval = mOpacityDelay / 100;
++                mOpacityTimer.Tick += new EventHandler( OpacityTimerTick );
++                mOpacityTimer.Enabled = true;
++            }
++        }
++
++        private void OpacityTimerTick( object sender, EventArgs e )
++        {
++            this.Opacity += ( mOpacityDirection * 0.01 );
++            Application.DoEvents();
++
++            if ( ( mOpacityTimer != null ) && ( ( this.Opacity >= 1.0 ) || ( this.Opacity < 0.1 ) ) )
++            {
++                mOpacityTimer.Enabled = false;
++                mOpacityTimer.Dispose();
++                mOpacityTimer = null;
++                this.Enabled = true;
++                if ( this.Opacity < 0.01 )
++                {
++                    this.Close();
++                }
++            }
++        }
++
++        private Timer mOpacityTimer = null;
++        private int mOpacityDirection = 1;
++        private int mOpacityDelay = -1;*/
+     }
+ }
+
+Modified: trunk/OCControls/OCLabel.cs
+===================================================================
+--- trunk/OCControls/OCLabel.cs	2006-10-24 18:40:46 UTC (rev 7)
++++ trunk/OCControls/OCLabel.cs	2006-11-12 11:47:01 UTC (rev 8)
+@@ -1,4 +1,4 @@
+-/////////////////////////////////////////////////////////
++/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ //
+ // OpenClogger - OCControls - OCLabel.cs
+ // $Id$
+@@ -24,15 +24,30 @@
+ 
+ // Subversion version control attributes
+ using OCInterface.SvnAttributes;
+-[assembly: SvnId("OCLabel.cs", "$Id$")]
+-[assembly: SvnRevision("OCLabel.cs", "$Revision$")]
+-[assembly: SvnAuthor("OCLabel.cs", "$Author$")]
+-[assembly: SvnHeadUrl("OCLabel.cs", "$HeadURL$")]
+-[assembly: SvnDate("OCLabel.cs", "$Date$")]
++[assembly: SvnId("$Id$")]
++[assembly: SvnHeadUrl("$HeadURL$")]
+ 
+ namespace OCControls
+ {
+-    public partial class OCLabel : Label
++    public partial class OCLabel : Label, IPaintBackground
+     {
++        public event PaintEventHandler PaintBackground;
++        protected override void OnPaintBackground( PaintEventArgs pevent )
++        {
++            if ( PaintBackground != null )
++            {
++                PaintBackground( this, pevent );
++            }
++        }
++
++        public Control GetOCParentControl( )
++        {
++            Control result = this;
++            if ( Parent is IPaintBackground )
++            {
++                result = ( (IPaintBackground)Parent ).GetOCParentControl();
++            }
++            return result;
++        }
+     }
+ }
+
+Added: trunk/OCControls/OCLinkLabel.cs
+===================================================================
+--- trunk/OCControls/OCLinkLabel.cs	2006-10-24 18:40:46 UTC (rev 7)
++++ trunk/OCControls/OCLinkLabel.cs	2006-11-12 11:47:01 UTC (rev 8)
+@@ -0,0 +1,53 @@
++/////////////////////////////////////////////////////////////////////////////////////////////////////////////
++//
++// OpenClogger - OCControls - OCLabel.cs
++// $Id$
++// $HeadURL$
++//
++// Copyright (c) 2006 OpenClogger Project
++//
++// This file is part of the sources for OpenClogger. It
++// is released under the OpenClogger License. Details of
++// the license can be found in the LICENSE file in the
++// root of the distribution or at the following URL:
++//
++// http://svn.berlios.de/svnroot/repos/openclogger/trunk/LICENSE
++//
++
++using System;
++using System.Collections.Generic;
++using System.ComponentModel;
++using System.Drawing;
++using System.Data;
++using System.Text;
++using System.Windows.Forms;
++
++// Subversion version control attributes
++using OCInterface.SvnAttributes;
++[assembly: SvnId( "$Id$" )]
++[assembly: SvnHeadUrl( "$HeadURL$" )]
++
++namespace OCControls
++{
++    public partial class OCLinkLabel : LinkLabel, IPaintBackground
++    {
++        public event PaintEventHandler PaintBackground;
++        protected override void OnPaintBackground( PaintEventArgs pevent )
++        {
++            if ( PaintBackground != null )
++            {
++                PaintBackground( this, pevent );
++            }
++        }
++
++        public Control GetOCParentControl( )
++        {
++            Control result = this;
++            if ( Parent is IPaintBackground )
++            {
++                result = ( (IPaintBackground)Parent ).GetOCParentControl();
++            }
++            return result;
++        }
++    }
++}
+
+
+Property changes on: trunk/OCControls/OCLinkLabel.cs
+___________________________________________________________________
+Name: svn:keywords
+   + Id Date HeadURL Author Revision
+Name: svn:eol-style
+   + native
+
+Added: trunk/OCControls/OCPictureBox.cs
+===================================================================
+--- trunk/OCControls/OCPictureBox.cs	2006-10-24 18:40:46 UTC (rev 7)
++++ trunk/OCControls/OCPictureBox.cs	2006-11-12 11:47:01 UTC (rev 8)
+@@ -0,0 +1,53 @@
++/////////////////////////////////////////////////////////
++//
++// OpenClogger - OCControls - OCLabel.cs
++// $Id$
++// $HeadURL$
++//
++// Copyright (c) 2006 OpenClogger Project
++//
++// This file is part of the sources for OpenClogger. It
++// is released under the OpenClogger License. Details of
++// the license can be found in the LICENSE file in the
++// root of the distribution or at the following URL:
++//
++// http://svn.berlios.de/svnroot/repos/openclogger/trunk/LICENSE
++//
++
++using System;
++using System.Collections.Generic;
++using System.ComponentModel;
++using System.Drawing;
++using System.Data;
++using System.Text;
++using System.Windows.Forms;
++
++// Subversion version control attributes
++using OCInterface.SvnAttributes;
++[assembly: SvnId( "$Id$" )]
++[assembly: SvnHeadUrl( "$HeadURL$" )]
++
++namespace OCControls
++{
++    public partial class OCPictureBox : PictureBox, IPaintBackground
++    {
++        public event PaintEventHandler PaintBackground;
++        protected override void OnPaintBackground( PaintEventArgs pevent )
++        {
++            if ( PaintBackground != null )
++            {
++                PaintBackground( this, pevent );
++            }
++        }
++
++        public Control GetOCParentControl( )
++        {
++            Control result = this;
++            if ( Parent is IPaintBackground )
++            {
++                result = ((IPaintBackground)Parent).GetOCParentControl();
++            }
++            return result;
++        }
++    }
++}
+
+
+Property changes on: trunk/OCControls/OCPictureBox.cs
+___________________________________________________________________
+Name: svn:keywords
+   + Id Date HeadURL Author Revision
+Name: svn:eol-style
+   + native
+
+Added: trunk/OCControls/OCSkinManager.cs
+===================================================================
+--- trunk/OCControls/OCSkinManager.cs	2006-10-24 18:40:46 UTC (rev 7)
++++ trunk/OCControls/OCSkinManager.cs	2006-11-12 11:47:01 UTC (rev 8)
+@@ -0,0 +1,117 @@
++/////////////////////////////////////////////////////////////////////////////////////////////////////////////
++//
++// OpenClogger - OCControls - OCLabel.cs
++// $Id$
++// $HeadURL$
++//
++// Copyright (c) 2006 OpenClogger Project
++//
++// This file is part of the sources for OpenClogger. It
++// is released under the OpenClogger License. Details of
++// the license can be found in the LICENSE file in the
++// root of the distribution or at the following URL:
++//
++// http://svn.berlios.de/svnroot/repos/openclogger/trunk/LICENSE
++//
++
++using System;
++using System.Collections.Generic;
++using System.Windows.Forms;
++using System.Drawing;
++using System.Drawing.Drawing2D;
++
++// Subversion version control attributes
++using OCInterface.SvnAttributes;
++[assembly: SvnId("$Id$")]
++[assembly: SvnHeadUrl("$HeadURL$")]
++
++namespace OCControls
++{
++    public class OCSkinManager
++    {
++        public static OCSkinManager Instance
++        {
++            get
++            {
++                if ( null == mSkinManager )
++                {
++                    mSkinManager = new OCSkinManager();
++                }
++                return mSkinManager;
++            }
++        }
++        
++
++
++        public void ManageControlSkin( IPaintBackground control )
++        {
++            mSkinManagedControls.Add( control );
++            control.PaintBackground += new PaintEventHandler( ManagedControlPaintBackground );
++
++            if ( control is Control )
++            {
++                foreach ( Control candidate in ( (Control)control ).Controls )
++                {
++                    if ( candidate is IPaintBackground )
++                    {
++                        ManageControlSkin( (IPaintBackground)candidate );
++                    }
++                }
++            }
++        }
++
++        private void ManagedControlPaintBackground( object sender, PaintEventArgs args )
++        {
++            if ( sender is Control )
++            {
++                Control baseControl   = (Control)sender;
++                Control clientControl = (Control)sender;
++
++                if ( clientControl is IPaintBackground )
++                {
++                    baseControl = ( (IPaintBackground)clientControl ).GetOCParentControl();
++                }
++
++                LinearGradientBrush brush = new LinearGradientBrush( baseControl.ClientRectangle,
++                    mGradientColor1, mGradientColor2, LinearGradientMode.Vertical );
++
++                if ( !object.ReferenceEquals( baseControl, clientControl ) )
++                {
++                    Bitmap bitmap = new Bitmap( baseControl.ClientRectangle.Width,
++                                                baseControl.ClientRectangle.Height );
++                    Graphics.FromImage( bitmap ).FillRectangle( brush, baseControl.ClientRectangle );
++
++                    Point srcLocation = clientControl.Location;
++                    if ( clientControl.Parent != null )
++                    {
++                        srcLocation = clientControl.Parent.PointToScreen( clientControl.Location );
++                        srcLocation = baseControl.PointToClient( srcLocation );
++                    }
++                    else
++                    {
++                        srcLocation = clientControl.ClientRectangle.Location;
++                    }
++
++                    Rectangle src = new Rectangle( srcLocation, clientControl.Bounds.Size );
++                    Rectangle dst = clientControl.ClientRectangle;
++                    args.Graphics.DrawImage( bitmap, dst, src, GraphicsUnit.Pixel );
++                }
++                else
++                {
++                    args.Graphics.FillRectangle( brush, ( (Control)sender ).ClientRectangle );
++                }
++            }
++        }
++
++        private OCSkinManager( )
++        {
++            
++        }
++
++        private List<IPaintBackground> mSkinManagedControls = new List<IPaintBackground>();
++        private Color mGradientColor1 = SystemColors.ControlDark;
++        private Color mGradientColor2 = SystemColors.ControlLight;
++
++        private static OCSkinManager mSkinManager = null;
++    }
++}
+
+
+Property changes on: trunk/OCControls/OCSkinManager.cs
+___________________________________________________________________
+Name: svn:keywords
+   + Id Date HeadURL Author Revision
+Name: svn:eol-style
+   + native
+
+Added: trunk/OCControls/OCTabControl.cs
+===================================================================
+--- trunk/OCControls/OCTabControl.cs	2006-10-24 18:40:46 UTC (rev 7)
++++ trunk/OCControls/OCTabControl.cs	2006-11-12 11:47:01 UTC (rev 8)
+@@ -0,0 +1,152 @@
++/////////////////////////////////////////////////////////////////////////////////////////////////////////////
++//
++// OpenClogger - OCControls - OCTabControl.cs
++// $Id$
++// $HeadURL$
++//
++// Copyright (c) 2006 OpenClogger Project
++//
++// This file is part of the sources for OpenClogger. It
++// is released under the OpenClogger License. Details of
++// the license can be found in the LICENSE file in the
++// root of the distribution or at the following URL:
++//
++// http://svn.berlios.de/svnroot/repos/openclogger/trunk/LICENSE
++//
++
++using System;
++using System.Collections.Generic;
++using System.ComponentModel;
++using System.Drawing;
++using System.Drawing.Drawing2D;
++using System.Data;
++using System.Text;
++using System.Windows.Forms;
++
++// Subversion version control attributes
++using OCInterface.SvnAttributes;
++[assembly: SvnId( "$Id$" )]
++[assembly: SvnHeadUrl( "$HeadURL$" )]
++
++namespace OCControls
++{
++    public partial class OCTabControl : TabControl, IPaintBackground
++    {
++        public OCTabControl( ) : base()
++        {
++            this.SetStyle( ControlStyles.SupportsTransparentBackColor, true );
++            this.SetStyle( ControlStyles.UserPaint, true );
++            this.SetStyle( ControlStyles.OptimizedDoubleBuffer, true );
++            this.ResizeRedraw = true;
++            this.BackColor = Color.Transparent;
++        }
++
++        public Control GetOCParentControl( )
++        {
++            Control result = this;
++            if ( Parent is IPaintBackground )
++            {
++                result = ( (IPaintBackground)Parent ).GetOCParentControl();
++            }
++            return result;
++        }
++
++        protected override void OnPaint( PaintEventArgs args )
++        {
++            if ( TabCount > 0 )
++            {
++                Rectangle bounds = TabPages[0].Bounds;
++                bounds.Inflate( 3, 3 );
++                args.Graphics.FillRectangle( new SolidBrush( SystemColors.Control ), bounds );
++                ControlPaint.DrawBorder3D( args.Graphics, bounds, Border3DStyle.RaisedOuter );
++            }
++
++            for ( int index = 0; index < this.TabCount; index++ )
++            {
++                PaintTab( index, args );
++            }
++        }
++
++        public event PaintEventHandler PaintBackground;
++        protected override void OnPaintBackground( PaintEventArgs pevent )
++        {
++            if ( PaintBackground != null )
++            {
++                PaintBackground( this, pevent );
++            }
++        }
++
++        private Region PaintTab( int index, PaintEventArgs args )
++        {
++            Region result = new Region();
++            result.MakeEmpty();
++
++            Rectangle tabRect = GetTabRect( index );
++            GraphicsPath path = GetPath( index );
++
++            if ( SelectedIndex == index )
++            {
++                LinearGradientBrush brush = new LinearGradientBrush( tabRect, SystemColors.ControlLightLight,
++                    SystemColors.Control, LinearGradientMode.Vertical );
++                args.Graphics.FillPath( brush, path );
++
++                args.Graphics.DrawLine( new Pen( SystemColors.Control, 2 ),
++                new Point( tabRect.Left + LeftTabMargin, tabRect.Bottom ),
++                new Point( tabRect.Right - RightTabMargin, tabRect.Bottom ) );
++            }
++            else
++            {
++                LinearGradientBrush brush = new LinearGradientBrush( tabRect, SystemColors.ControlLight,
++                    SystemColors.Control, LinearGradientMode.Vertical );
++                args.Graphics.FillPath( brush, path );
++
++                args.Graphics.DrawLine( new Pen( SystemColors.ControlDark, 2 ),
++                new Point( tabRect.Left + LeftTabMargin, tabRect.Bottom ),
++                new Point( tabRect.Right - RightTabMargin, tabRect.Bottom ) );
++            }
++            args.Graphics.DrawPath( new Pen( SystemColors.ControlDark, 2 ), path );
++            path.AddLine( new Point( tabRect.Left + LeftTabMargin, tabRect.Bottom ),
++                new Point( tabRect.Right - RightTabMargin, tabRect.Bottom ) );
++
++            Size textSize = args.Graphics.MeasureString( TabPages[index].Text, TabPages[index].Font ).ToSize();
++
++            int deltaX = tabRect.Width - textSize.Width;
++            int halfDeltaX = deltaX / 2;
++
++            int deltaY = tabRect.Height - textSize.Height;
++            int halfDeltaY = deltaY / 2;
++
++            args.Graphics.DrawString( TabPages[index].Text, TabPages[index].Font, Brushes.Black,
++                tabRect.Left + halfDeltaX, tabRect.Top + halfDeltaY );
++            
++            return new Region( path );
++        }
++
++        private GraphicsPath GetPath( int index )
++        {
++            GraphicsPath path = new GraphicsPath();
++            Rectangle rect = GetTabRect( index );
++
++            Point p1 = new Point( rect.Left + LeftTabMargin, rect.Bottom );
++            Point p2 = new Point( rect.Left + LeftTabMargin, rect.Top + TopTabMargin + TabRoundoverRadius );
++            Point p3 = new Point( rect.Left + LeftTabMargin + TabRoundoverRadius, rect.Top + TopTabMargin );
++
++            Point p4 = new Point( rect.Right - RightTabMargin - TabRoundoverRadius, rect.Top + TopTabMargin );
++            Point p5 = new Point( rect.Right - RightTabMargin, rect.Top + TopTabMargin + TabRoundoverRadius );
++            Point p6 = new Point( rect.Right - RightTabMargin, rect.Bottom );
++
++            path.AddLine( p1, p2 );
++            path.AddLine( p2, p3 );
++            path.AddLine( p3, p4 );
++            path.AddLine( p4, p5 );
++            path.AddLine( p5, p6 );
++
++            return path;
++        }
++
++        private const int LeftTabMargin = 0;
++        private const int RightTabMargin = 0;
++        private const int TopTabMargin = 0;
++        private const int TabRoundoverRadius = 4;
++    }
++}
+
+
+Property changes on: trunk/OCControls/OCTabControl.cs
+___________________________________________________________________
+Name: svn:keywords
+   + Id Date HeadURL Author Revision
+Name: svn:eol-style
+   + native
+
+Added: trunk/OCControls/OCTabPage.cs
+===================================================================
+--- trunk/OCControls/OCTabPage.cs	2006-10-24 18:40:46 UTC (rev 7)
++++ trunk/OCControls/OCTabPage.cs	2006-11-12 11:47:01 UTC (rev 8)
+@@ -0,0 +1,52 @@
++/////////////////////////////////////////////////////////////////////////////////////////////////////////////
++//
++// OpenClogger - OCControls - OCLabel.cs
++// $Id$
++// $HeadURL$
++//
++// Copyright (c) 2006 OpenClogger Project
++//
++// This file is part of the sources for OpenClogger. It
++// is released under the OpenClogger License. Details of
++// the license can be found in the LICENSE file in the
++// root of the distribution or at the following URL:
++//
++// http://svn.berlios.de/svnroot/repos/openclogger/trunk/LICENSE
++//
++
++using System;
++using System.Collections.Generic;
++using System.ComponentModel;
++using System.Drawing;
++using System.Data;
++using System.Text;
++using System.Windows.Forms;
++
++// Subversion version control attributes
++using OCInterface.SvnAttributes;
++[assembly: SvnId( "$Id$" )]
++[assembly: SvnHeadUrl( "$HeadURL$" )]
++
++namespace OCControls
++{
++    public partial class OCTabPage : TabPage, IPaintBackground
++    {
++        public OCTabPage( string name ) : base( name )
++        { }
++
++        public event PaintEventHandler PaintBackground;
++        protected override void OnPaintBackground( PaintEventArgs pevent )
++        {
++            if ( PaintBackground != null )
++            {
++                PaintBackground( this, pevent );
++            }
++        }
++
++        public Control GetOCParentControl( )
++        {
++            Control result = this;
++            return result;
++        }
++    }
++}
+
+
+Property changes on: trunk/OCControls/OCTabPage.cs
+___________________________________________________________________
+Name: svn:keywords
+   + Id Date HeadURL Author Revision
+Name: svn:eol-style
+   + native
+
+Added: trunk/OCControls/OCTooltipForm.cs
+===================================================================
+--- trunk/OCControls/OCTooltipForm.cs	2006-10-24 18:40:46 UTC (rev 7)
++++ trunk/OCControls/OCTooltipForm.cs	2006-11-12 11:47:01 UTC (rev 8)
+@@ -0,0 +1,71 @@
++/////////////////////////////////////////////////////////
++//
++// OpenClogger - OCControls - OCToolTipForm.cs
++// $Id$
++// $HeadURL$
++//
++// Copyright (c) 2006 OpenClogger Project
++//
++// This file is part of the sources for OpenClogger. It
++// is released under the OpenClogger License. Details of
++// the license can be found in the LICENSE file in the
++// root of the distribution or at the following URL:
++//
++// http://svn.berlios.de/svnroot/repos/openclogger/trunk/LICENSE
++//
++
++using System;
++using System.Collections.Generic;
++using System.ComponentModel;
++using System.Data;
++using System.Drawing;
++using System.Drawing.Drawing2D;
++using System.Text;
++using System.Windows.Forms;
++
++// Subversion version control attributes
++using OCInterface.SvnAttributes;
++[assembly: SvnId( "$Id$" )]
++[assembly: SvnHeadUrl( "$HeadURL$" )]
++
++namespace OCControls
++{
++    public class OCTooltipForm : Form
++    {
++        public OCTooltipForm( Form owner, Control realOwner, object clientData )
++        {
++            InitializeComponent();
++            Location = Cursor.Position;
++            mClientData = clientData;
++            mRealOwner = realOwner;
++        }
++
++        public object ClientData
++        { get { return mClientData; } }
++
++        private void InitializeComponent( )
++        {
++            this.SuspendLayout();
++            // 
++            // OCTooltipForm
++            // 
++            this.ClientSize = new System.Drawing.Size( 292, 273 );
++            this.ControlBox = false;
++            this.DoubleBuffered = true;
++            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
++            this.MaximizeBox = false;
++            this.MinimizeBox = false;
++            this.Name = "OCTooltipForm";
++            this.ShowIcon = false;
++            this.ShowInTaskbar = false;
++            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
++            this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
++            this.TopMost = true;
++            this.ResumeLayout( false );
++
++        }
++
++        private Control mRealOwner = null;
++        private object mClientData = null;
++    }
++}
+\ No newline at end of file
+
+
+Property changes on: trunk/OCControls/OCTooltipForm.cs
+___________________________________________________________________
+Name: svn:keywords
+   + Id Date HeadURL Author Revision
+Name: svn:eol-style
+   + native
+
+Added: trunk/OCControls/OCTooltipForm.resx
+===================================================================
+--- trunk/OCControls/OCTooltipForm.resx	2006-10-24 18:40:46 UTC (rev 7)
++++ trunk/OCControls/OCTooltipForm.resx	2006-11-12 11:47:01 UTC (rev 8)
+@@ -0,0 +1,120 @@
++<?xml version="1.0" encoding="utf-8"?>
++<root>
++  <!-- 
++    Microsoft ResX Schema 
++    
++    Version 2.0
++    
++    The primary goals of this format is to allow a simple XML format 
++    that is mostly human readable. The generation and parsing of the 
++    various data types are done through the TypeConverter classes 
++    associated with the data types.
++    
++    Example:
++    
++    ... ado.net/XML headers & schema ...
++    <resheader name="resmimetype">text/microsoft-resx</resheader>
++    <resheader name="version">2.0</resheader>
++    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
++    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
++    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
++    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
++    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
++        <value>[base64 mime encoded serialized .NET Framework object]</value>
++    </data>
++    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
++        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
++        <comment>This is a comment</comment>
++    </data>
++                
++    There are any number of "resheader" rows that contain simple 
++    name/value pairs.
++    
++    Each data row contains a name, and value. The row also contains a 
++    type or mimetype. Type corresponds to a .NET class that support 
++    text/value conversion through the TypeConverter architecture. 
++    Classes that don't support this are serialized and stored with the 
++    mimetype set.
++    
++    The mimetype is used for serialized objects, and tells the 
++    ResXResourceReader how to depersist the object. This is currently not 
++    extensible. For a given mimetype the value must be set accordingly:
++    
++    Note - application/x-microsoft.net.object.binary.base64 is the format 
++    that the ResXResourceWriter will generate, however the reader can 
++    read any of the formats listed below.
++    
++    mimetype: application/x-microsoft.net.object.binary.base64
++    value   : The object must be serialized with 
++            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
++            : and then encoded with base64 encoding.
++    
++    mimetype: application/x-microsoft.net.object.soap.base64
++    value   : The object must be serialized with 
++            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
++            : and then encoded with base64 encoding.
++
++    mimetype: application/x-microsoft.net.object.bytearray.base64
++    value   : The object must be serialized into a byte array 
++            : using a System.ComponentModel.TypeConverter
++            : and then encoded with base64 encoding.
++    -->
++  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
++    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
++    <xsd:element name="root" msdata:IsDataSet="true">
++      <xsd:complexType>
++        <xsd:choice maxOccurs="unbounded">
++          <xsd:element name="metadata">
++            <xsd:complexType>
++              <xsd:sequence>
++                <xsd:element name="value" type="xsd:string" minOccurs="0" />
++              </xsd:sequence>
++              <xsd:attribute name="name" use="required" type="xsd:string" />
++              <xsd:attribute name="type" type="xsd:string" />
++              <xsd:attribute name="mimetype" type="xsd:string" />
++              <xsd:attribute ref="xml:space" />
++            </xsd:complexType>
++          </xsd:element>
++          <xsd:element name="assembly">
++            <xsd:complexType>
++              <xsd:attribute name="alias" type="xsd:string" />
++              <xsd:attribute name="name" type="xsd:string" />
++            </xsd:complexType>
++          </xsd:element>
++          <xsd:element name="data">
++            <xsd:complexType>
++              <xsd:sequence>
++                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
++                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
++              </xsd:sequence>
++              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
++              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
++              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
++              <xsd:attribute ref="xml:space" />
++            </xsd:complexType>
++          </xsd:element>
++          <xsd:element name="resheader">
++            <xsd:complexType>
++              <xsd:sequence>
++                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
++              </xsd:sequence>
++              <xsd:attribute name="name" type="xsd:string" use="required" />
++            </xsd:complexType>
++          </xsd:element>
++        </xsd:choice>
++      </xsd:complexType>
++    </xsd:element>
++  </xsd:schema>
++  <resheader name="resmimetype">
++    <value>text/microsoft-resx</value>
++  </resheader>
++  <resheader name="version">
++    <value>2.0</value>
++  </resheader>
++  <resheader name="reader">
++    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
++  </resheader>
++  <resheader name="writer">
++    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
++  </resheader>
++</root>
+\ No newline at end of file
+
+Modified: trunk/OCControls/Properties/AssemblyInfo.cs
+===================================================================
+--- trunk/OCControls/Properties/AssemblyInfo.cs	2006-10-24 18:40:46 UTC (rev 7)
++++ trunk/OCControls/Properties/AssemblyInfo.cs	2006-11-12 11:47:01 UTC (rev 8)
+@@ -18,6 +18,7 @@
+ using System.Reflection;
+ using System.Runtime.CompilerServices;
+ using System.Runtime.InteropServices;
++using OCInterface.OpenCloggerAttributes;
+ using OCInterface.SvnAttributes;
+ 
+ // General Information about an assembly is controlled through the following 
+@@ -55,10 +56,8 @@
+ [assembly: AssemblyVersion("0.0.1.0")]
+ [assembly: AssemblyFileVersion("0.0.1.0")]
+ [assembly: AssemblyInformationalVersion("0.0.1.0")]
++[assembly: OpenCloggerAssembly]
+ 
+ // Subversion version control attributes
+-[assembly: SvnId("AssemblyInfo.cs", "$Id$")]
+-[assembly: SvnRevision("AssemblyInfo.cs", "$Revision$")]
+-[assembly: SvnAuthor("AssemblyInfo.cs", "$Author$")]
+-[assembly: SvnHeadUrl("AssemblyInfo.cs", "$HeadURL$")]
+-[assembly: SvnDate("AssemblyInfo.cs", "$Date$")]
+\ No newline at end of file
++[assembly: SvnId("$Id$")]
++[assembly: SvnHeadUrl("$HeadURL$")]
+\ No newline at end of file
+
+Added: trunk/OCInterface/AboutForm.Designer.cs
+===================================================================
+--- trunk/OCInterface/AboutForm.Designer.cs	2006-10-24 18:40:46 UTC (rev 7)
++++ trunk/OCInterface/AboutForm.Designer.cs	2006-11-12 11:47:01 UTC (rev 8)
+@@ -0,0 +1,253 @@
++/////////////////////////////////////////////////////////////////////////////////////////////////////////////
++//
++// OpenClogger - OCInterface - AboutForm.Designer.cs
++// $Id$
++// $HeadURL$
++//
++// Copyright (c) 2006 OpenClogger Project
++//
++// This file is part of the sources for OpenClogger. It
++// is released under the OpenClogger License. Details of
++// the license can be found in the LICENSE file in the
++// root of the distribution or at the following URL:
++//
++// http://svn.berlios.de/svnroot/repos/openclogger/trunk/LICENSE
++//
++
++using OCControls;
++
++// Subversion version control attributes
++using OCInterface.SvnAttributes;
++[assembly: SvnId("$Id$")]
++[assembly: SvnHeadUrl( "$HeadURL$" )]
++
++namespace OpenClogger
++{
++    partial class AboutForm
++    {
++        /// <summary>
++        /// Required designer variable.
++        /// </summary>
++        private System.ComponentModel.IContainer components = null;
++
++        /// <summary>
++        /// Clean up any resources being used.
++        /// </summary>
++        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
++        protected override void Dispose(bool disposing)
++        {
++            if (disposing && (components != null))
++            {
++                components.Dispose();
++            }
++            base.Dispose(disposing);
++        }
++
++        #region Windows Form Designer generated code
++
++        /// <summary>
++        /// Required method for Designer support - do not modify
++        /// the contents of this method with the code editor.
++        /// </summary>
++        private void InitializeComponent()
++        {
++            this.components = new System.ComponentModel.Container();
++            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager( typeof( AboutForm ) );
++            this.mOkButton = new OCButton();
++            this.mDetailsButton = new OCButton();
++            this.mAssemblyInfoTabs = new OCTabControl();
++            this.mOpenCloggerBanner = new OCLabel();
++            this.mOpenCloggerTag = new OCLabel();
++            this.mVersionLabel = new OCLabel();
++            this.label2 = new OCLabel();
++            this.mVersionText = new OCLabel();
++            this.mOpenCloggerLink = new OCLinkLabel();
++            this.mLargeImageList = new System.Windows.Forms.ImageList( this.components );
++            this.mSmallImageList = new System.Windows.Forms.ImageList( this.components );
++            this.mExport = new OCButton();
++            this.mOpenCloggerLogo = new OCPictureBox();
++            ( (System.ComponentModel.ISupportInitialize)( this.mOpenCloggerLogo ) ).BeginInit();
++            this.SuspendLayout();
++            // 
++            // mOkButton
++            // 
++            this.mOkButton.Anchor = ( (System.Windows.Forms.AnchorStyles)( ( System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right ) ) );
++            this.mOkButton.Location = new System.Drawing.Point( 252, 343 );
++            this.mOkButton.Name = "mOkButton";
++            this.mOkButton.Size = new System.Drawing.Size( 75, 23 );
++            this.mOkButton.TabIndex = 0;
++            this.mOkButton.Text = "&Ok";
++            this.mOkButton.UseVisualStyleBackColor = true;
++            this.mOkButton.Click += new System.EventHandler( this.mOkButton_Click );
++            // 
++            // mDetailsButton
++            // 
++            this.mDetailsButton.Anchor = ( (System.Windows.Forms.AnchorStyles)( ( System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right ) ) );
++            this.mDetailsButton.Location = new System.Drawing.Point( 333, 343 );
++            this.mDetailsButton.Name = "mDetailsButton";
++            this.mDetailsButton.Size = new System.Drawing.Size( 75, 23 );
++            this.mDetailsButton.TabIndex = 2;
++            this.mDetailsButton.Text = "Details >>";
++            this.mDetailsButton.UseVisualStyleBackColor = true;
++            this.mDetailsButton.Click += new System.EventHandler( this.mDetailsButton_Click );
++            // 
++            // mAssemblyInfoTabs
++            // 
++            this.mAssemblyInfoTabs.Location = new System.Drawing.Point( 13, 115 );
++            this.mAssemblyInfoTabs.Name = "mAssemblyInfoTabs";
++            this.mAssemblyInfoTabs.SelectedIndex = 0;
++            this.mAssemblyInfoTabs.Size = new System.Drawing.Size( 395, 222 );
++            this.mAssemblyInfoTabs.TabIndex = 3;
++            this.mAssemblyInfoTabs.Visible = false;
++            // 
++            // mOpenCloggerBanner
++            // 
++            this.mOpenCloggerBanner.AutoSize = true;
++            this.mOpenCloggerBanner.Font = new System.Drawing.Font( "Comic Sans MS", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ( (byte)( 0 ) ) );
++            this.mOpenCloggerBanner.Location = new System.Drawing.Point( 114, 12 );
++            this.mOpenCloggerBanner.Name = "mOpenCloggerBanner";
++            this.mOpenCloggerBanner.Size = new System.Drawing.Size( 211, 45 );
++            this.mOpenCloggerBanner.TabIndex = 4;
++            this.mOpenCloggerBanner.Text = "OpenClogger";
++            // 
++            // mOpenCloggerTag
++            // 
++            this.mOpenCloggerTag.AutoSize = true;
++            this.mOpenCloggerTag.Location = new System.Drawing.Point( 139, 58 );
++            this.mOpenCloggerTag.Name = "mOpenCloggerTag";
++            this.mOpenCloggerTag.Size = new System.Drawing.Size( 204, 13 );
++            this.mOpenCloggerTag.TabIndex = 5;
++            this.mOpenCloggerTag.Text = "Logging contests for amateurs since 2006";
++            // 
++            // mVersionLabel
++            // 
++            this.mVersionLabel.AutoSize = true;
++            this.mVersionLabel.Location = new System.Drawing.Point( 119, 80 );
++            this.mVersionLabel.Name = "mVersionLabel";
++            this.mVersionLabel.Size = new System.Drawing.Size( 45, 13 );
++            this.mVersionLabel.TabIndex = 6;
++            this.mVersionLabel.Text = "Version:";
++            // 
++            // label2
++            // 
++            this.label2.AutoSize = true;
++            this.label2.Location = new System.Drawing.Point( 119, 95 );
++            this.label2.Name = "label2";
++            this.label2.Size = new System.Drawing.Size( 191, 13 );
++            this.label2.TabIndex = 7;
++            this.label2.Text = "Copyright ? 2006 OpenClogger Project";
++            // 
++            // mVersionText
++            // 
++            this.mVersionText.AutoSize = true;
++            this.mVersionText.Location = new System.Drawing.Point( 170, 80 );
++            this.mVersionText.Name = "mVersionText";
++            this.mVersionText.Size = new System.Drawing.Size( 64, 13 );
++            this.mVersionText.TabIndex = 8;
++            this.mVersionText.Text = "00.00.00.00";
++            // 
++            // mOpenCloggerLink
++            // 
++            this.mOpenCloggerLink.ActiveLinkColor = System.Drawing.Color.FromArgb( ( (int)( ( (byte)( 255 ) ) ) ), ( (int)( ( (byte)( 128 ) ) ) ), ( (int)( ( (byte)( 128 ) ) ) ) );
++            this.mOpenCloggerLink.Anchor = ( (System.Windows.Forms.AnchorStyles)( ( System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left ) ) );
++            this.mOpenCloggerLink.AutoSize = true;
++            this.mOpenCloggerLink.DisabledLinkColor = System.Drawing.Color.Gray;
++            this.mOpenCloggerLink.LinkColor = System.Drawing.Color.FromArgb( ( (int)( ( (byte)( 128 ) ) ) ), ( (int)( ( (byte)( 128 ) ) ) ), ( (int)( ( (byte)( 255 ) ) ) ) );
++            this.mOpenCloggerLink.Location = new System.Drawing.Point( 9, 348 );
++            this.mOpenCloggerLink.Name = "mOpenCloggerLink";
++            this.mOpenCloggerLink.Size = new System.Drawing.Size( 145, 13 );
++            this.mOpenCloggerLink.TabIndex = 9;
++            this.mOpenCloggerLink.TabStop = true;
++            this.mOpenCloggerLink.Text = "http://openclogger.berlios.de";
++            this.mOpenCloggerLink.VisitedLinkColor = System.Drawing.Color.FromArgb( ( (int)( ( (byte)( 128 ) ) ) ), ( (int)( ( (byte)( 128 ) ) ) ), ( (int)( ( (byte)( 255 ) ) ) ) );
++            // 
++            // mLargeImageList
++            // 
++            this.mLargeImageList.ImageStream = ( (System.Windows.Forms.ImageListStreamer)( resources.GetObject( "mLargeImageList.ImageStream" ) ) );
++            this.mLargeImageList.TransparentColor = System.Drawing.Color.Transparent;
++            this.mLargeImageList.Images.SetKeyName( 0, "csharp_large.ico" );
++            this.mLargeImageList.Images.SetKeyName( 1, "c_large.ico" );
++            this.mLargeImageList.Images.SetKeyName( 2, "cpp_large.ico" );
++            this.mLargeImageList.Images.SetKeyName( 3, "h_large.ico" );
++            // 
++            // mSmallImageList
++            // 
++            this.mSmallImageList.ImageStream = ( (System.Windows.Forms.ImageListStreamer)( resources.GetObject( "mSmallImageList.ImageStream" ) ) );
++            this.mSmallImageList.TransparentColor = System.Drawing.Color.Transparent;
++            this.mSmallImageList.Images.SetKeyName( 0, "csharp_small.ico" );
++            this.mSmallImageList.Images.SetKeyName( 1, "c_small.ico" );
++            this.mSmallImageList.Images.SetKeyName( 2, "cpp_small.ico" );
++            this.mSmallImageList.Images.SetKeyName( 3, "h_small.ico" );
++            // 
++            // mExport
++            // 
++            this.mExport.Anchor = ( (System.Windows.Forms.AnchorStyles)( ( System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right ) ) );
++            this.mExport.Enabled = false;
++            this.mExport.Location = new System.Drawing.Point( 171, 343 );
++            this.mExport.Name = "mExport";
++            this.mExport.Size = new System.Drawing.Size( 75, 23 );
++            this.mExport.TabIndex = 10;
++            this.mExport.Text = "&Export";
++            this.mExport.UseVisualStyleBackColor = true;
++            this.mExport.Visible = false;
++            // 
++            // mOpenCloggerLogo
++            // 
++            this.mOpenCloggerLogo.Image = global::OpenClogger.Properties.Resources.vs_logo;
++            this.mOpenCloggerLogo.Location = new System.Drawing.Point( 12, 12 );
++            this.mOpenCloggerLogo.Name = "mOpenCloggerLogo";
++            this.mOpenCloggerLogo.Size = new System.Drawing.Size( 96, 96 );
++            this.mOpenCloggerLogo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
++            this.mOpenCloggerLogo.TabIndex = 1;
++            this.mOpenCloggerLogo.TabStop = false;
++            // 
++            // AboutForm
++            // 
++            this.AutoScaleDimensions = new System.Drawing.SizeF( 6F, 13F );
++            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
++            this.ClientSize = new System.Drawing.Size( 420, 376 );
++            this.ControlBox = false;
++            this.Controls.Add( this.mExport );
++            this.Controls.Add( this.mOpenCloggerLink );
++            this.Controls.Add( this.mVersionText );
++            this.Controls.Add( this.label2 );
++            this.Controls.Add( this.mVersionLabel );
++            this.Controls.Add( this.mOpenCloggerTag );
++            this.Controls.Add( this.mOpenCloggerBanner );
++            this.Controls.Add( this.mDetailsButton );
++            this.Controls.Add( this.mOpenCloggerLogo );
++            this.Controls.Add( this.mOkButton );
++            this.Controls.Add( this.mAssemblyInfoTabs );
++            this.DoubleBuffered = true;
++            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
++            this.MaximizeBox = false;
++            this.MinimizeBox = false;
++            this.Name = "AboutForm";
++            this.ShowIcon = false;
++            this.ShowInTaskbar = false;
++            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
++            this.Text = "About OpenClogger";
++            this.Load += new System.EventHandler( this.AboutForm_Load );
++            ( (System.ComponentModel.ISupportInitialize)( this.mOpenCloggerLogo ) ).EndInit();
++            this.ResumeLayout( false );
++            this.PerformLayout();
++
++        }
++
++        #endregion
++
++        private System.Windows.Forms.Button mOkButton;
++        private System.Windows.Forms.PictureBox mOpenCloggerLogo;
++        private System.Windows.Forms.Button mDetailsButton;
++        private System.Windows.Forms.TabControl mAssemblyInfoTabs;
++        private System.Windows.Forms.Label mOpenCloggerBanner;
++        private System.Windows.Forms.Label mOpenCloggerTag;
++        private System.Windows.Forms.Label mVersionLabel;
++        private System.Windows.Forms.Label label2;
++        private System.Windows.Forms.Label mVersionText;
++        private System.Windows.Forms.LinkLabel mOpenCloggerLink;
++        private System.Windows.Forms.ImageList mLargeImageList;
++        private System.Windows.Forms.ImageList mSmallImageList;
++        private System.Windows.Forms.Button mExport;
++    }
++}
+\ No newline at end of file
+
+
+Property changes on: trunk/OCInterface/AboutForm.Designer.cs
+___________________________________________________________________
+Name: svn:keywords
+   + Id Date HeadURL Author Revision
+Name: svn:eol-style
+   + native
+
+Added: trunk/OCInterface/AboutForm.cs
+===================================================================
+--- trunk/OCInterface/AboutForm.cs	2006-10-24 18:40:46 UTC (rev 7)
++++ trunk/OCInterface/AboutForm.cs	2006-11-12 11:47:01 UTC (rev 8)
+@@ -0,0 +1,355 @@
++/////////////////////////////////////////////////////////////////////////////////////////////////////////////
++//
++// OpenClogger - OCInterface - AboutForm.cs
++// $Id$
++// $HeadURL$
++//
++// Copyright (c) 2006 OpenClogger Project
++//
++// This file is part of the sources for OpenClogger. It
++// is released under the OpenClogger License. Details of
++// the license can be found in the LICENSE file in the
++// root of the distribution or at the following URL:
++//
++// http://svn.berlios.de/svnroot/repos/openclogger/trunk/LICENSE
++//
++
++using System;
++using System.Collections.Generic;
++using System.ComponentModel;
++using System.Drawing;
++using System.Data;
++using System.Text;
++using System.Windows.Forms;
++using OCControls;
++using System.Reflection;
++using System.Runtime.InteropServices;
++using OCInterface.OpenCloggerAttributes;
++
++// Subversion version control attributes
++using OCInterface.SvnAttributes;
++[assembly: SvnId("$Id$")]
++[assembly: SvnHeadUrl("$HeadURL$")]
++
++namespace OpenClogger
++{
++    public partial class AboutForm : OCForm
++    {
++        public AboutForm()
++        {
++            InitializeComponent();
++            OCSkinManager.Instance.ManageControlSkin( this );
++        }
++
++        private void AboutForm_Load(object sender, EventArgs e)
++        {
++            this.Height -= mAssemblyInfoTabs.Height;
++            foreach ( Assembly assembly in AppDomain.CurrentDomain.GetAssemblies() )
++            {
++                Attribute[] hasOCAssemblyAttrs = (Attribute[])assembly.GetCustomAttributes( typeof( OpenCloggerAssembly ), false );
++                Attribute[] hasOCPluginAttrs = (Attribute[])assembly.GetCustomAttributes( typeof( OpenCloggerPlugin ), false );
++                if ( ( hasOCAssemblyAttrs.Length > 0 ) || ( hasOCPluginAttrs.Length > 0 ) )
++                {
++                    AssemblyName name = assembly.GetName();
++
++                    TabPage page = new TabPage( name.Name );
++                    page.BackColor = SystemColors.Control;
++                    Label lastLabel = null;
++                    Label label = null;
++
++                    using ( Graphics g = page.CreateGraphics() )
++                    {
++                        string status = "File: ";
++                        status += System.IO.Path.GetFileNameWithoutExtension( assembly.CodeBase );
++                        status += System.IO.Path.GetExtension( assembly.CodeBase ).ToLower();
++                        status += " " + name.Version;
++                        status += " (";
++                        status += name.Name;
++                        status += ")";
++
++                        label = new Label();
++                        label.BackColor = SystemColors.Control;
++                        label.Font = new Font( "Courier New", 10.0F, FontStyle.Bold );
++                        label.Text = (string)status.Clone();
++                        label.Name = "mAssemblyNameLabel";
++                        label.Size = g.MeasureString( label.Text, label.Font, mAssemblyInfoTabs.ClientRectangle.Width ).ToSize();
++                        label.Location = new Point( page.ClientRectangle.Left, page.ClientRectangle.Top );
++                        page.Controls.Add( label );
++                        lastLabel = label;
++                    }
++
++                    SortedDictionary<string,AssemblyFileEntry> dict = new SortedDictionary<string,AssemblyFileEntry>();
++                    SvnIdAttribute[] svnIdAttrs = (SvnIdAttribute[])assembly.GetCustomAttributes( typeof( SvnIdAttribute ), false );
++                    foreach ( SvnIdAttribute svnIdAttr in svnIdAttrs )
++                    {
++                        AssemblyFileEntry entry = null;
++                        if ( !dict.ContainsKey( svnIdAttr.File ) )
++                        {
++                            entry = new AssemblyFileEntry();
++                            dict.Add( svnIdAttr.File, entry );
++                        }
++                        else
++                        {
++                            entry = dict[svnIdAttr.File];
++                        }
++                        entry.Id = svnIdAttr;
++                    }
++
++                    SvnHeadUrlAttribute[] svnHeadUrlAttrs = (SvnHeadUrlAttribute[])assembly.GetCustomAttributes( typeof( SvnHeadUrlAttribute ), false );
++                    foreach ( SvnHeadUrlAttribute svnHeadUrlAttr in svnHeadUrlAttrs )
++                    {
++                        AssemblyFileEntry entry = null;
++                        if ( !dict.ContainsKey( svnHeadUrlAttr.File ) )
++                        {
++                            entry = new AssemblyFileEntry();
++                            dict.Add( svnHeadUrlAttr.File, entry );
++                        }
++                        else
++                        {
++                            entry = dict[svnHeadUrlAttr.File];
++                        }
++                        entry.URL = svnHeadUrlAttr;
++                    }
++
++                    ListView list = new ListView();
++                    list.FullRowSelect = true;
++                    list.GridLines = true;
++                    list.HeaderStyle = ColumnHeaderStyle.Nonclickable;
++                    list.HideSelection = true;
++                    list.HotTracking = false;
++                    list.HoverSelection = false;
++                    list.ItemActivate += new EventHandler(ListItemActivateEventHandler);
++                    list.ItemMouseHover += new ListViewItemMouseHoverEventHandler( ListItemMouseHoverEventHandler );
++                    list.LabelEdit = false;
++                    list.LabelWrap = true;
++                    list.LargeImageList = mLargeImageList;
++                    list.MouseMove += new MouseEventHandler(ListViewMouseMoveEventHandler);
++                    list.MultiSelect = false;
++                    list.Name = "mFileList";
++                    list.Scrollable = true;
++                    list.ShowItemToolTips = false;
++                    list.ShowGroups = false;
++                    list.SmallImageList = mSmallImageList;
++                    list.Sorting = SortOrder.Ascending;
++                    list.TileSize = new Size( 300, 45 );
++                    list.View = View.Details;
++
++                    ColumnHeader header0 = new ColumnHeader();
++                    header0.Text = "Filename";
++
++                    ColumnHeader header1 = new ColumnHeader();
++                    header1.Text = "Rev";
++
++                    ColumnHeader header2 = new ColumnHeader();
++                    header2.Text = "Author";
++                    
++                    ColumnHeader header3 = new ColumnHeader();
++                    header3.Text = "Date/Time";
++
++                    ColumnHeader header4 = new ColumnHeader();
++                    header4.Text = "Branch";
++
++                    ColumnHeader header5 = new ColumnHeader();
++                    header5.Text = "Path";
++                    
++                    list.Columns.Add( header0 );
++                    list.Columns.Add( header1 );
++                    list.Columns.Add( header2 );
++                    list.Columns.Add( header3 );
++                    list.Columns.Add( header4 );
++                    list.Columns.Add( header5 );
++
++                    page.ClientSizeChanged += new EventHandler(TabResizedEventHandler);
++                    mAssemblyInfoTabs.SelectedIndexChanged +=new EventHandler(TabSelectedIndexChanged);
++                    //page.Controls.Add( list );
++
++                    int index = 0;
++                    int[] widths = new int[list.Columns.Count];
++                    
++                    using ( Graphics g = list.CreateGraphics() )
++                    {
++                        index = 0;
++                        foreach ( ColumnHeader header in list.Columns )
++                        {
++                            widths[index++] = g.MeasureString( header.Text, list.Font ).ToSize().Width;
++                        }
++
++                        foreach ( AssemblyFileEntry entry in dict.Values )
++                        {
++                            string[] datums = { entry.Id.File, entry.Id.Revision, entry.Id.Author,
++                                                entry.Id.LastEdit.ToLocalTime().ToString(),
++                                                entry.URL.Branch, entry.URL.Path };
++
++                            index = 0;
++                            ListViewItem item = new ListViewItem( datums[0] );
++                            foreach ( string datum in datums )
++                            {
++                                int width = g.MeasureString( datums[index], list.Font ).ToSize().Width;
++                                widths[index] = Math.Max( width, widths[index] );
++                                if ( index > 0 )
++                                {
++                                    item.SubItems.Add( new ListViewItem.ListViewSubItem( item, datums[index] ) );
++                                }
++                                index++;
++                            }
++                            item.ImageIndex = 0;
++                            item.Tag = entry;
++                            list.Items.Add( item );
++                        }
++
++                        index = 0;
++                        foreach ( ColumnHeader header in list.Columns )
++                        {
++                            header.Width = widths[index++] + 10;
++                        }
++                    }
++
++                    mAssemblyInfoTabs.TabPages.Add( page );
++                }
++            }
++        }
++
++        private void ListItemActivateEventHandler( object sender, EventArgs args )
++        {
++            ListView list = (ListView)sender;
++            AssemblyFileEntry entry = (AssemblyFileEntry)( list.SelectedItems[0].Tag );
++            System.Diagnostics.Process.Start( entry.URL.URL );
++        }
++
++        private void ListViewMouseMoveEventHandler( object sender, MouseEventArgs e )
++        {
++            if ( mTooltipForm != null )
++            {
++                AssemblyFileEntry entry = null;
++
++                ListView list = (ListView)( mAssemblyInfoTabs.SelectedTab.Controls["mFileList"] );
++                Point cursor = list.PointToClient( new Point( Cursor.Position.X, Cursor.Position.Y ) );
++                if( list.ClientRectangle.Contains( cursor ) )
++                {
++                    ListViewItem item = list.GetItemAt( cursor.X, cursor.Y );
++                    if ( item != null )
++                    {
++                        entry = (AssemblyFileEntry)( item.Tag );
++                        if ( !entry.Equals( mTooltipForm.ClientData ) )
++                        {
++                            entry = null;
++                        }
++                    }
++                }
++
++                if ( null == entry )
++                {
++                    mTooltipForm.Close();
++                    mTooltipForm.Dispose();
++                    mTooltipForm = null;
++                }
++                else
++                {
++                    mTooltipForm.Location = Cursor.Position;
++                }
++            }
++        }
++
++        private void ListItemMouseHoverEventHandler( object sender, ListViewItemMouseHoverEventArgs e )
++        {
++            ListView list = (ListView)sender;
++            AssemblyFileEntry entry = (AssemblyFileEntry)e.Item.Tag;
++
++            ListViewMouseMoveEventHandler( list, new MouseEventArgs( MouseButtons.None, 0, Cursor.Position.X, Cursor.Position.X, 0 ) );
++
++            if ( null == mTooltipForm )
++            {
++                mTooltipForm = new OCTooltipForm( this, list, entry );
++                mTooltipForm.MouseMove += new MouseEventHandler(ListViewMouseMoveEventHandler);
++                mTooltipForm.Show();
++            }
++        }
++
++        private void TabSelectedIndexChanged( object sender, EventArgs args )
++        {
++            TabResizedEventHandler( ( (TabControl)sender ).SelectedTab, EventArgs.Empty );
++        }
++        
++        private void TabResizedEventHandler( object sender, EventArgs args )
++        {
++            if ( this.Enabled )
++            {
++                TabPage page = (TabPage)sender;
++                ListView list = (ListView)( mAssemblyInfoTabs.SelectedTab.Controls["mFileList"] );
++                Label label = (Label)( mAssemblyInfoTabs.SelectedTab.Controls["mAssemblyNameLabel"] );
++                if ( ( list != null ) && ( label != null ) )
++                {
++                    list.Location = new Point( page.ClientRectangle.Left, page.ClientRectangle.Top + label.Height );
++                    list.Size = new Size( page.ClientSize.Width, page.ClientSize.Height - label.Height );
++                }
++            }
++        }
++
++        private void mOkButton_Click( object sender, EventArgs e )
++        {
++            this.Close();
++        }
++
++        private void mDetailsButton_Click(object sender, EventArgs e)
++        {
++            this.Enabled = false;
++            bool startedVisible = mAssemblyInfoTabs.Visible;
++            int tabHeight = mAssemblyInfoTabs.Height;
++
++            int animationTime = 1000;
++            int animationStepSize = 10;
++            int formHeightStep = animationStepSize;
++            mAssemblyInfoTabs.Visible = false;
++
++            if ( !startedVisible )
++            {
++                formHeightStep = 1 * animationStepSize;
++            }
++            else
++            {
++                formHeightStep = -1 * animationStepSize;
++            }
++
++            int animationSteps = tabHeight / animationStepSize;
++            int delay = animationTime / animationSteps;
++
++            while ( animationSteps > 0 )
++            {
++                this.Height += formHeightStep;
++                //System.Threading.Thread.Sleep( delay );
++                Application.DoEvents();
++                animationSteps--;
++            }
++
++            if ( !startedVisible )
++            {
++                mAssemblyInfoTabs.Visible = true;
++            }
++
++            mAssemblyInfoTabs.Height = tabHeight;
++            if ( mAssemblyInfoTabs.Visible )
++            {
++                ( (Button)sender ).Text = "<< Details";
++            }
++            else
++            {
++                ( (Button)sender ).Text = "Details >>";
++            }
++            this.Enabled = true;
++            mAssemblyInfoTabs.Height = (mAssemblyInfoTabs.Height += 1) -1;
++        }
++
++        private class AssemblyFileEntry
++        {
++            public SvnIdAttribute Id = null;
++            public SvnHeadUrlAttribute URL = null;
++
++            public override string ToString( )
++            {
++                return Id.File;
++            }
++        }
++
++        private OCTooltipForm mTooltipForm = null;
++    }
++}
+\ No newline at end of file
+
+
+Property changes on: trunk/OCInterface/AboutForm.cs
+___________________________________________________________________
+Name: svn:keywords
+   + Id Date HeadURL Author Revision
+Name: svn:eol-style
+   + native
+
+Added: trunk/OCInterface/AboutForm.resx
+===================================================================
+--- trunk/OCInterface/AboutForm.resx	2006-10-24 18:40:46 UTC (rev 7)
++++ trunk/OCInterface/AboutForm.resx	2006-11-12 11:47:01 UTC (rev 8)
+@@ -0,0 +1,577 @@
++<?xml version="1.0" encoding="utf-8"?>
++<root>
++  <!-- 
++    Microsoft ResX Schema 
++    
++    Version 2.0
++    
++    The primary goals of this format is to allow a simple XML format 
++    that is mostly human readable. The generation and parsing of the 
++    various data types are done through the TypeConverter classes 
++    associated with the data types.
++    
++    Example:
++    
++    ... ado.net/XML headers & schema ...
++    <resheader name="resmimetype">text/microsoft-resx</resheader>
++    <resheader name="version">2.0</resheader>
++    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
++    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
++    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
++    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
++    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
++        <value>[base64 mime encoded serialized .NET Framework object]</value>
++    </data>
++    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
++        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
++        <comment>This is a comment</comment>
++    </data>
++                
++    There are any number of "resheader" rows that contain simple 
++    name/value pairs.
++    
++    Each data row contains a name, and value. The row also contains a 
++    type or mimetype. Type corresponds to a .NET class that support 
++    text/value conversion through the TypeConverter architecture. 
++    Classes that don't support this are serialized and stored with the 
++    mimetype set.
++    
++    The mimetype is used for serialized objects, and tells the 
++    ResXResourceReader how to depersist the object. This is currently not 
++    extensible. For a given mimetype the value must be set accordingly:
++    
++    Note - application/x-microsoft.net.object.binary.base64 is the format 
++    that the ResXResourceWriter will generate, however the reader can 
++    read any of the formats listed below.
++    
++    mimetype: application/x-microsoft.net.object.binary.base64
++    value   : The object must be serialized with 
++            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
++            : and then encoded with base64 encoding.
++    
++    mimetype: application/x-microsoft.net.object.soap.base64
++    value   : The object must be serialized with 
++            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
++            : and then encoded with base64 encoding.
++
++    mimetype: application/x-microsoft.net.object.bytearray.base64
++    value   : The object must be serialized into a byte array 
++            : using a System.ComponentModel.TypeConverter
++            : and then encoded with base64 encoding.
++    -->
++  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
++    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
++    <xsd:element name="root" msdata:IsDataSet="true">
++      <xsd:complexType>
++        <xsd:choice maxOccurs="unbounded">
++          <xsd:element name="metadata">
++            <xsd:complexType>
++              <xsd:sequence>
++                <xsd:element name="value" type="xsd:string" minOccurs="0" />
++              </xsd:sequence>
++              <xsd:attribute name="name" use="required" type="xsd:string" />
++              <xsd:attribute name="type" type="xsd:string" />
++              <xsd:attribute name="mimetype" type="xsd:string" />
++              <xsd:attribute ref="xml:space" />
++            </xsd:complexType>
++          </xsd:element>
++          <xsd:element name="assembly">
++            <xsd:complexType>
++              <xsd:attribute name="alias" type="xsd:string" />
++              <xsd:attribute name="name" type="xsd:string" />
++            </xsd:complexType>
++          </xsd:element>
++          <xsd:element name="data">
++            <xsd:complexType>
++              <xsd:sequence>
++                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
++                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
++              </xsd:sequence>
++              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
++              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
++              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
++              <xsd:attribute ref="xml:space" />
++            </xsd:complexType>
++          </xsd:element>
++          <xsd:element name="resheader">
++            <xsd:complexType>
++              <xsd:sequence>
++                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
++              </xsd:sequence>
++              <xsd:attribute name="name" type="xsd:string" use="required" />
++            </xsd:complexType>
++          </xsd:element>
++        </xsd:choice>
++      </xsd:complexType>
++    </xsd:element>
++  </xsd:schema>
++  <resheader name="resmimetype">
++    <value>text/microsoft-resx</value>
++  </resheader>
++  <resheader name="version">
++    <value>2.0</value>
++  </resheader>
++  <resheader name="reader">
++    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
++  </resheader>
++  <resheader name="writer">
++    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
++  </resheader>
++  <metadata name="mLargeImageList.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
++    <value>22, 20</value>
++  </metadata>
++  <data name="mLargeImageList.ImageStream" mimetype="application/x-microsoft.net.object.binary.base64">
++    <value>
++        AAEAAAD/////AQAAAAAAAAAMAgAAAFdTeXN0ZW0uV2luZG93cy5Gb3JtcywgVmVyc2lvbj0yLjAuMC4w
++        LCBDdWx0dXJlPW5ldXRyYWwsIFB1YmxpY0tleVRva2VuPWI3N2E1YzU2MTkzNGUwODkFAQAAACZTeXN0
++        ZW0uV2luZG93cy5Gb3Jtcy5JbWFnZUxpc3RTdHJlYW1lcgEAAAAERGF0YQcCAgAAAAkDAAAADwMAAACM
++        TgAAAk1TRnQBSQFMAgEBBAEAAQkBAAEEAQABIAEAASABAAT/ASEBAAj/AUIBTQE2BwABNgMAASgDAAGA
++        AwABQAMAAQEBAAEgBgABgP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A
++        /wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A
++        /wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AGwAAYEBaQFXAf8BZAFKATYB/wFkAUoBNgH/AWQBSgE2
++        Af8BZAFKATYB/wFkAUoBNgH/AWQBSgE2Af8BZAFKATYB/wFkAUoBNgH/AWQBSgE2Af8BZAFKATYB/wFk
++        AUoBNgH/AWQBSgE2Af8BZAFKATYB/wFkAUoBNgH/AWQBSgE2Af8BZAFKATYB/wFkAUoBNgH/AWQBSgE2
++        Af8BZAFKATYB/wFkAUoBNgH/AWQBSgE2Af8BZAFKATYB/xwAAYEBaQFXAf8BZAFKATYB/wFkAUoBNgH/
++        AWQBSgE2Af8BZAFKATYB/wFkAUoBNgH/AWQBSgE2Af8BZAFKATYB/wFkAUoBNgH/AWQBSgE2Af8BZAFK
++        ATYB/wFkAUoBNgH/AWQBSgE2Af8BZAFKATYB/wFkAUoBNgH/AWQBSgE2Af8BZAFKATYB/wFkAUoBNgH/
++        AWQBSgE2Af8BZAFKATYB/wFkAUoBNgH/AWQBSgE2Af8BZAFKATYB/zAAAYEBaQFXAf8BZAFKATYB/wFk
++        AUoBNgH/AWQBSgE2Af8BZAFKATYB/wFkAUoBNgH/AWQBSgE2Af8BZAFKATYB/wFkAUoBNgH/AWQBSgE2
++        Af8BZAFKATYB/wFkAUoBNgH/AWQBSgE2Af8BZAFKATYB/wFkAUoBNgH/AWQBSgE2Af8BZAFKATYB/wFk
++        AUoBNgH/AWQBSgE2Af8BZAFKATYB/wFkAUoBNgH/AWQBSgE2Af8BZAFKATYB/xgAAYEBaQFXAf8BZAFK
++        ATYB/wFkAUoBNgH/AWQBSgE2Af8BZAFKATYB/wFkAUoBNgH/AWQBSgE2Af8BZAFKATYB/wFkAUoBNgH/
++        AWQBSgE2Af8BZAFKATYB/wFkAUoBNgH/AWQBSgE2Af8BZAFKATYB/wFkAUoBNgH/AWQBSgE2Af8BZAFK
++        ATYB/wFkAUoBNgH/AWQBSgE2Af8BZAFKATYB/wFkAUoBNgH/AWQBSgE2Af8BZAFKATYB/ywAAYQBbAFa
++        Af8B9AHbAc4B/wHeAcABsQH/AdwBvgGuAf8B2wG8AawB/wHbAbsBqgH/AdkBuQGoAf8B2AG3AaUB/wHY
++        AbUBowH/AdcBswGhAf8B1gGxAZ8B/wHWAbABnAH/AdQBrQGaAf8B1AGrAZcB/wHSAaoBlgH/AdIBqAGT
++        Af8B0AGmAZEB/wHQAaQBjwH/Ac8BowGNAf8BzwGgAYsB/wHNAZ8BiQH/Ac0BngGHAf8BZAFKATYB/xwA
++        AYQBbAFaAf8B9AHbAc4B/wHeAcABsQH/AdwBvgGuAf8B2wG8AawB/wHbAbsBqgH/AdkBuQGoAf8B2AG3
++        AaUB/wHYAbUBowH/AdcBswGhAf8B1gGxAZ8B/wHWAbABnAH/AdQBrQGaAf8B1AGrAZcB/wHSAaoBlgH/
++        AdIBqAGTAf8B0AGmAZEB/wHQAaQBjwH/Ac8BowGNAf8BzwGgAYsB/wHNAZ8BiQH/Ac0BngGHAf8BZAFK
++        ATYB/zAAAYQBbAFaAf8B9AHbAc4B/wHeAcABsQH/AdwBvgGuAf8B2wG8AawB/wHbAbsBqgH/AdkBuQGo
++        Af8B2AG3AaUB/wHYAbUBowH/AdcBswGhAf8B1gGxAZ8B/wHWAbABnAH/AdQBrQGaAf8B1AGrAZcB/wHS
++        AaoBlgH/AdIBqAGTAf8B0AGmAZEB/wHQAaQBjwH/Ac8BowGNAf8BzwGgAYsB/wHNAZ8BiQH/Ac0BngGH
++        Af8BZAFKATYB/xgAAYQBbAFaAf8B9AHbAc4B/wHeAcABsQH/AdwBvgGuAf8B2wG8AawB/wHbAbsBqgH/
++        AdkBuQGoAf8B2AG3AaUB/wHYAbUBowH/AdcBswGhAf8B1gGxAZ8B/wHWAbABnAH/AdQBrQGaAf8B1AGr
++        AZcB/wHSAaoBlgH/AdIBqAGTAf8B0AGmAZEB/wHQAaQBjwH/Ac8BowGNAf8BzwGgAYsB/wHNAZ8BiQH/
++        Ac0BngGHAf8BZAFKATYB/ywAAYYBbwFcAf8B9AHcAdEB/wH1AeEB1gH/AfUB3wHUAf8B9QHdAdIB/wH0
++        AdwB0AH/AfQB2gHNAf8B8wHYAcsB/wHyAdcByQH/AfIB1QHHAf8B8QHUAcYB/wHxAdIBwwH/AfEB0QHB
++        Af8B8QHQAcAB/wHxAc4BvgH/AfABzQG8Af8B8AHNAbsB/wHwAcsBuQH/Ae8BygG4Af8B7wHJAbcB/wHu
++        AcgBtQH/Ac0BoAGJAf8BZAFKATYB/xwAAYYBbwFcAf8B9AHcAdEB/wH1AeEB1gH/AfUB3wHUAf8B9QHd
++        AdIB/wH0AdwB0AH/AfQB2gHNAf8B8wHYAcsB/wHyAdcByQH/AfIB1QHHAf8B8QHUAcYB/wHxAdIBwwH/
++        AfEB0QHBAf8B8QHQAcAB/wHxAc4BvgH/AfABzQG8Af8B8AHNAbsB/wHwAcsBuQH/Ae8BygG4Af8B7wHJ
++        AbcB/wHuAcgBtQH/Ac0BoAGJAf8BZAFKATYB/zAAAYYBbwFcAf8B9AHcAdEB/wH1AeEB1gH/AfUB3wHU
++        Af8B9QHdAdIB/wH0AdwB0AH/AfQB2gHNAf8B8wHYAcsB/wHyAdcByQH/AfIB1QHHAf8B8QHUAcYB/wHx
++        AdIBwwH/AfEB0QHBAf8B8QHQAcAB/wHxAc4BvgH/AfABzQG8Af8B8AHNAbsB/wHwAcsBuQH/Ae8BygG4
++        Af8B7wHJAbcB/wHuAcgBtQH/Ac0BoAGJAf8BZAFKATYB/xgAAYYBbwFcAf8B9AHcAdEB/wH1AeEB1gH/
++        AfUB3wHUAf8B9QHdAdIB/wH0AdwB0AH/AfQB2gHNAf8B8wHYAcsB/wHyAdcByQH/AfIB1QHHAf8B8QHU
++        AcYB/wHxAdIBwwH/AfEB0QHBAf8B8QHQAcAB/wHxAc4BvgH/AfABzQG8Af8B8AHNAbsB/wHwAcsBuQH/
++        Ae8BygG4Af8B7wHJAbcB/wHuAcgBtQH/Ac0BoAGJAf8BZAFKATYB/ywAAYkBcQFfAf8B9QHfAdMB/wH2
++        AeMB2gH/AfYB4gHXAf8B9gHgAdUB/wH1Ad4B0wH/AfUB3QHRAf8B9AHbAc4B/wH0AdkBzQH/AfMB2AHL
++        Af8B8wHWAcgB/wHyAdUBxgH/AfIB1AHFAf8B8QHSAcMB/wHxAdABwQH/AfEBzwG/Af8B8AHOAb0B/wHw
++        Ac0BuwH/Ae8BzAG6Af8B7wHLAbkB/wHvAckBuAH/Ac8BoQGLAf8BZAFKATYB/xwAAYkBcQFfAf8B9QHf
++        AdMB/wH2AeMB2gH/AfYB4gHXAf8B9gHgAdUB/wH1Ad4B0wH/AfUB3QHRAf8B9AHbAc4B/wH0AdkBzQH/
++        AfMB2AHLAf8B8wHWAcgB/wHyAdUBxgH/AfIB1AHFAf8B8QHSAcMB/wHxAdABwQH/AfEBzwG/Af8B8AHO
++        Ab0B/wHwAc0BuwH/Ae8BzAG6Af8B7wHLAbkB/wHvAckBuAH/Ac8BoQGLAf8BZAFKATYB/zAAAYkBcQFf
++        Af8B9QHfAdMB/wH2AeMB2gH/AfYB4gHXAf8B9gHgAdUB/wH1Ad4B0wH/AfUB3QHRAf8B9AHbAc4B/wH0
++        AdkBzQH/AfMB2AHLAf8B8wHWAcgB/wHyAdUBxgH/AfIB1AHFAf8B8QHSAcMB/wHxAdABwQH/AfEBzwG/
++        Af8B8AHOAb0B/wHwAc0BuwH/Ae8BzAG6Af8B7wHLAbkB/wHvAckBuAH/Ac8BoQGLAf8BZAFKATYB/xgA
++        AYkBcQFfAf8B9QHfAdMB/wH2AeMB2gH/AfYB4gHXAf8B9gHgAdUB/wH1Ad4B0wH/AfUB3QHRAf8B9AHb
++        Ac4B/wH0AdkBzQH/AfMB2AHLAf8B8wHWAcgB/wHyAdUBxgH/AfIB1AHFAf8B8QHSAcMB/wHxAdABwQH/
++        AfEBzwG/Af8B8AHOAb0B/wHwAc0BuwH/Ae8BzAG6Af8B7wHLAbkB/wHvAckBuAH/Ac8BoQGLAf8BZAFK
++        ATYB/ywAAYsBdAFiAf8B9gHgAdYB/wH4AeYB3QH/AfcB5AHbAf8B9gHjAdkB/wH2AeEB1wH/AfUB3wHU
++        Af8B9QHdAdIB/wH0AdwB0AH/AfQB2gHOAf8B9AHZAcwB/wHzAdcBygH/AfMB1QHIAf8B8gHVAcYB/wHy
++        AdIBxAH/AfIB0gHCAf8B8AHQAcAB/wHwAc4BvgH/AfABzgG9Af8B8AHMAbsB/wHvAcsBugH/AdABogGN
++        Af8BZAFKATYB/xwAAYsBdAFiAf8B9gHgAdYB/wH4AeYB3QH/AfcB5AHbAf8B9gHjAdkB/wH2AeEB1wH/
++        AfUB3wHUAf8B9QHdAdIB/wH0AdwB0AH/AfQB2gHOAf8B9AHZAcwB/wHzAdcBygH/AfMB1QHIAf8B8gHV
++        AcYB/wHyAdIBxAH/AfIB0gHCAf8B8AHQAcAB/wHwAc4BvgH/AfABzgG9Af8B8AHMAbsB/wHvAcsBugH/
++        AdABogGNAf8BZAFKATYB/zAAAYsBdAFiAf8B9gHgAdYB/wH4AeYB3QH/AfcB5AHbAf8B9gHjAdkB/wH2
++        AeEB1wH/AfUB3wHUAf8B9QHdAdIB/wH0AdwB0AH/AfQB2gHOAf8B9AHZAcwB/wHzAdcBygH/AfMB1QHI
++        Af8B8gHVAcYB/wHyAdIBxAH/AfIB0gHCAf8B8AHQAcAB/wHwAc4BvgH/AfABzgG9Af8B8AHMAbsB/wHv
++        AcsBugH/AdABogGNAf8BZAFKATYB/xgAAYsBdAFiAf8B9gHgAdYB/wH4AeYB3QH/AfcB5AHbAf8B9gHj
++        AdkB/wH2AeEB1wH/AfUB3wHUAf8B9QHdAdIB/wH0AdwB0AH/AfQB2gHOAf8B9AHZAcwB/wHzAdcBygH/
++        AfMB1QHIAf8B8gHVAcYB/wHyAdIBxAH/AfIB0gHCAf8B8AHQAcAB/wHwAc4BvgH/AfABzgG9Af8B8AHM
++        AbsB/wHvAcsBugH/AdABogGNAf8BZAFKATYB/ywAAY0BdwFlAf8B9gHiAdgB/wH4AegB4AH/AfgB5wHf
++        Af8BygG3AaoB/wHIAbQBpwH/AcQBsAGiAf8BwAGsAZ4B/wG8AaYBmQH/AbYBogGTAf8BsQGcAYwB/wGr
++        AZYBhgH/AaUBkAGAAf8BoAGJAXoB/wGaAYQBcwH/AZQBfgFuAf8BkAF5AWcB/wGLAXQBYgH/AYgBcAFd
++        Af8B8AHOAb0B/wHwAc0BvAH/AdABpAGPAf8BZAFKATYB/xwAAY0BdwFlAf8B9gHiAdgB/wH4AegB4AH/
++        AfgB5wHfAf8B9wHlAd0B/wH2AeMB2gH/AfYB4gHXAf8B9gHgAdYB/wH1Ad4B1AH/AfQB3QHSAf8B9AHb
++        Ac8B/wH0AdoBzQH/AfQB2AHLAf8B8gHXAckB/wHyAdUBxwH/AfEB1AHFAf8B8gHSAcMB/wHxAdEBwQH/
++        AfAB0AG/Af8B8AHOAb0B/wHwAc0BvAH/AdABpAGPAf8BZAFKATYB/zAAAY0BdwFlAf8B9gHiAdgB/wH4
++        AegB4AH/AfgB5wHfAf8B9wHlAd0B/wH2AeMB2gH/AfYB4gHXAf8B9gHgAdYB/wH1Ad4B1AH/AfQB3QHS
++        Af8B9AHbAc8B/wH0AdoBzQH/AfQB2AHLAf8B8gHXAckB/wHyAdUBxwH/AfEB1AHFAf8B8gHSAcMB/wHx
++        AdEBwQH/AfAB0AG/Af8B8AHOAb0B/wHwAc0BvAH/AdABpAGPAf8BZAFKATYB/xgAAY0BdwFlAf8B9gHi
++        AdgB/wH4AegB4AH/AfgB5wHfAf8B9wHlAd0B/wH2AeMB2gH/AfYB4gHXAf8B9gHgAdYB/wH1Ad4B1AH/
++        AfQB3QHSAf8B9AHbAc8B/wH0AdoBzQH/AfQB2AHLAf8B8gHXAckB/wHyAdUBxwH/AfEB1AHFAf8B8gHS
++        AcMB/wHxAdEBwQH/AfAB0AG/Af8B8AHOAb0B/wHwAc0BvAH/AdABpAGPAf8BZAFKATYB/ywAAY8BeQFo
++        Af8B9wHkAdsB/wH5AesB5QH/AfgB6QHiAf8B+AHoAeAB/wH4AeYB3QH/AfcB5AHbAf8B9gHjAdkB/wH2
++        AeEB1wH/AfUB4AHVAf8B9QHeAdMB/wH0AdwB0AH/AfQB2wHOAf8B9AHZAcwB/wHzAdcBygH/AfIB1gHI
++        Af8B8gHUAcYB/wHyAdMBxAH/AfEB0gHDAf8B8QHRAcAB/wHwAc8BvgH/AdEBpgGRAf8BZAFKATYB/xwA
++        AY8BeQFoAf8B9wHkAdsB/wH5AesB5QH/AfgB6QHiAf8B+AHoAeAB/wH4AeYB3QH/AfcB5AHbAf8B9gHk
++        AdsB/wH3AeQB2wH/AfcB5QHcAf8B9wHkAdsB/wH2AeMB2QH/AfYB4QHVAf8B9QHdAdEB/wHzAdkBzAH/
++        AfIB1gHIAf8B8gHUAcYB/wHyAdMBxAH/AfEB0gHDAf8B8QHRAcAB/wHwAc8BvgH/AdEBpgGRAf8BZAFK
++        ATYB/zAAAY8BeQFoAf8B9wHkAdsB/wH5AesB5QH/AfgB6QHiAf8B+AHoAeAB/wH4AeYB3QH/AfcB5AHb
++        Af8B9gHjAdkB/wH2AeEB1wH/AfUB4AHVAf8B9QHeAdMB/wH0AdwB0AH/AfQB2wHOAf8B9AHZAcwB/wHz
++        AdcBygH/AfIB1gHIAf8B8gHUAcYB/wHyAdMBxAH/AfEB0gHDAf8B8QHRAcAB/wHwAc8BvgH/AdEBpgGR
++        Af8BZAFKATYB/xgAAY8BeQFoAf8B9wHkAdsB/wH5AesB5QH/AfgB6QHiAf8B+AHoAeAB/wH4AeYB3QH/
++        AfcB5AHbAf8B9gHjAdkB/wH2AeEB1wH/AfUB4AHVAf8B9QHeAdMB/wH0AdwB0AH/AfQB2wHOAf8B9AHZ
++        AcwB/wHzAdcBygH/AfIB1gHIAf8B8gHUAcYB/wHyAdMBxAH/AfEB0gHDAf8B8QHRAcAB/wHwAc8BvgH/
++        AdEBpgGRAf8BZAFKATYB/ywAAZIBfAFqAf8B+AHmAd4B/wH5Ae0B6AH/AfkB7AHlAf8B+QHqAeQB/wH4
++        AekB4QH/AfgB5wHfAf8B+AHmAd0B/wH3AeQB2wH/AfcB4gHYAf8B9QHgAdYB/wH1Ad8B1AH/AfQB3QHS
++        Af8B9AHcAc8B/wH0AdoBzQH/AfQB2AHLAf8B8gHWAckB/wHzAdUBxwH/AfIB1AHFAf8B8QHSAcMB/wHx
++        AdEBwQH/AdIBqQGUAf8BZAFKATYB/xwAAZIBfAFqAf8B+AHmAd4B/wH5Ae0B6AH/AfkB7AHlAf8B+QHq
++        AeQB/wH4AeoB4gH/AfkB6gHjAf8B+gHsAeUB/wH6Ae8B6gH/AfsB8QHtAf8B+wHzAe8B/wH7AfIB7gH/
++        AfoB7wHpAf8B+AHpAeEB/wH2AeIB2AH/AfUB3AHQAf8B8gHXAcoB/wHzAdUBxwH/AfIB1AHFAf8B8QHS
++        AcMB/wHxAdEBwQH/AdIBqQGUAf8BZAFKATYB/zAAAZIBfAFqAf8B+AHmAd4B/wH5Ae0B6AH/AfkB7AHl
++        Af8B+QHqAeQB/wH4AekB4QH/AfgB5wHfAf8B+AHmAd0B/wH3AeQB2wH/AfcB4gHYAf8B9QHgAdYB/wH1
++        Ad8B1AH/AfQB3QHSAf8B9AHcAc8B/wH0AdoBzQH/AfQB2AHLAf8B8gHWAckB/wHzAdUBxwH/AfIB1AHF
++        Af8B8QHSAcMB/wHxAdEBwQH/AdIBqQGUAf8BZAFKATYB/xgAAZIBfAFqAf8B+AHmAd4B/wH5Ae0B6AH/
++        AfkB7AHlAf8B+QHqAeQB/wH4AeoB4gH/AfkB6gHiAf8B+QHqAeIB/wH4AegB4AH/AfgB5AHbAf8B9QHh
++        AdcB/wH1AeEB1gH/AfUB4QHXAf8B9gHhAdYB/wH1Ad8B1AH/AfUB2wHPAf8B8gHXAcoB/wHzAdUBxwH/
++        AfIB1AHFAf8B8QHSAcMB/wHxAdEBwQH/AdIBqQGUAf8BZAFKATYB/ywAAZUBfgFtAf8B+AHoAeEB/wH6
++        AfAB6wH/AfoB7wHpAf8BygG3AaoB/wHIAbQBpwH/AcQBsAGiAf8BwAGsAZ4B/wG8AaYBmQH/AbYBogGT
++        Af8BsQGcAYwB/wGrAZYBhgH/AaUBkAGAAf8BoAGJAXoB/wGaAYQBcwH/AZQBfgFuAf8BkAF5AWcB/wGL
++        AXQBYgH/AYgBcAFdAf8B8gHVAcYB/wHxAdMBxQH/AdMBqwGWAf8BZAFKATYB/xwAAZUBfgFtAf8B+AHo
++        AeEB/wH6AfAB6wH/AfoB7wHpAf8B+gHuAegB/wH6Ae4B6QH/AfoB8QHsAf8B9wHrAeMB/wHZAasBhgH/
++        AbkBZwEjAf8BrgFQAQEB/wGuAVABAQH/Ab4BcwE0Af8B2AGqAYQB/wH6Ae8B6wH/AfcB5QHbAf8B9QHc
++        AdIB/wH0AdgBywH/AfMB1gHIAf8B8gHVAcYB/wHxAdMBxQH/AdMBqwGWAf8BZAFKATYB/zAAAZUBfgFt
++        Af8B+AHoAeEB/wH6AfAB6wH/AfoB7wHpAf8B+gHtAecB/wH5AesB5QH/AfgB6QHiAf8B+AHoAeAB/wH4
++        AecB3gH/AfcB5QHcAf8B9gHjAdkB/wH2AeEB1wH/AfUB3wHWAf8B9QHeAdMB/wH0AdwB0QH/AfQB2wHO
++        Af8B9AHZAc0B/wH0AdgBygH/AfMB1gHIAf8B8gHVAcYB/wHxAdMBxQH/AdMBqwGWAf8BZAFKATYB/xgA
++        AZUBfgFtAf8B+AHoAeEB/wH6AfAB6wH/AfoB7wHpAf8B+gHuAegB/wH6Ae4B6QH/AfoB8AHrAf8B+wHy
++        Ae0B/wH7AfEB6wH/AfkB6wHkAf8B9wHmAd0B/wH3AeUB3QH/AfgB6QHjAf8B+QHsAeYB/wH4AeoB4wH/
++        AfYB4wHZAf8B9QHcAdEB/wH0AdgBygH/AfMB1gHIAf8B8gHVAcYB/wHxAdMBxQH/AdMBqwGWAf8BZAFK
++        ATYB/ywAAZ8BigF8Af8B+gHtAegB/wH8AfQB8QH/AfsB8gHuAf8B+wHvAeoB/wH6Ae4B6AH/AfkB7AHm
++        Af8B+QHrAeMB/wH5AekB4QH/AfgB5wHgAf8B9wHmAd4B/wH2AeQB2wH/AfYB4gHYAf8B9gHhAdcB/wH1
++        Ad8B1AH/AfUB3QHSAf8B9AHcAdAB/wH0AdoBzgH/AfMB2QHLAf8B8wHXAckB/wHyAdUByAH/AdQBrAGZ
++        Af8BZAFKATYB/xwAAZYBgAFwAf8B+QHqAeMB/wH7AfIB7gH/AfsB8AHsAf8B+wHxAewB/wH8AfQB8AH/
++        Ae0B1wHGAf8BswFcARIB/wGuAVABAQH/Aa4BUAEBAf8BrgFQAQEB/wGuAVABAQH/Aa4BUAEBAf8BrgFQ
++        AQEB/wG+AXMBNAH/AfYB5gHcAf8B9wHkAdsB/wH1AdwB0AH/AfMB2QHLAf8B8wHXAckB/wHyAdUByAH/
++        AdQBrAGZAf8BZAFKATYB/zAAAZYBgAFwAf8B+QHqAeMB/wH7AfIB7gH/AfsB8AHsAf8B+wHvAeoB/wH6
++        Ae4B6AH/AfkB7AHmAf8B+QHrAeMB/wH5AekB4QH/AfgB5wHgAf8B9wHmAd4B/wH2AeQB2wH/AfYB4gHY
++        Af8B9gHhAdcB/wH1Ad8B1AH/AfUB3QHSAf8B9AHcAdAB/wH0AdoBzgH/AfMB2QHLAf8B8wHXAckB/wHy
++        AdUByAH/AdQBrAGZAf8BZAFKATYB/xgAAZYBgAFwAf8B+QHqAeMB/wH7AfIB7gH/AfsB8AHsAf8B+wHw
++        AesB/wH7AfMB7gH/AdgBqQGDAf8BrgFQAQEB/wGuAVABAQH/AfsB8QHtAf8B+QHrAeUB/wH5AewB5QH/
++        AdgBqAGBAf8BrgFQAQEB/wGuAVABAQH/AfkB7AHmAf8B9gHhAdcB/wH0AdoBzgH/AfMB2QHLAf8B8wHX
++        AckB/wHyAdUByAH/AdQBrAGZAf8BZAFKATYB/yQAAQ0CAgEOATkCEQFAAb4BsQGmAf8B/AH1AfIB/wH9
++        AfkB+AH/Af0B+AH2Af8B/AH2AfMB/wH7AfQB8AH/AfsB8gHvAf8B+wH0Ae8B/wH7AfAB7AH/AfkB6wHl
++        Af8B+AHpAeAB/wH4AeYB3wH/AfgB5QHdAf8B9gHjAdoB/wH2AeIB1wH/AfUB4AHVAf8B9QHeAdQB/wH1
++        Ad0B0QH/AfQB3AHPAf8B9AHaAc0B/wHzAdgBywH/AdUBrgGbAf8BZAFKATYB/xwAAZgBggFyAf8B+QHs
++        AeYB/wH8AfQB8QH/AfsB9AHwAf8B/AH1AfEB/wH4Ae8B5wH/AbkBZwEjAf8BrgFQAQEB/wGzAVwBEgH/
++        AdkBrQGIAf8B6QHPAboB/wHkAcQBqgH/Ab4BcwE0Af8BrgFQAQEB/wGuAVABAQH/AdgBqgGEAf8B+QHr
++        AeQB/wH2AeAB1gH/AfQB3AHPAf8B9AHaAc0B/wHzAdgBywH/AdUBrgGbAf8BZAFKATYB/zAAAZgBggFy
++        Af8B+QHsAeYB/wH8AfQB8QH/AfsB8wHvAf8B+wHyAe0B/wH6AfEB6wH/AfoB7gHqAf8B+QHuAecB/wH6
++        AesB5QH/AfkB6gHjAf8B+AHpAeAB/wH4AeYB3wH/AfgB5QHdAf8B9gHjAdoB/wH2AeIB1wH/AfUB4AHV
++        Af8B9QHeAdQB/wH1Ad0B0QH/AfQB3AHPAf8B9AHaAc0B/wHzAdgBywH/AdUBrgGbAf8BZAFKATYB/xgA
++        AZgBggFyAf8B+QHsAeYB/wH8AfQB8QH/AfsB8wHvAf8B+wHzAe8B/wH8AfYB8gH/AdkBqwGGAf8BrgFQ
++        AQEB/wGuAVABAQH/AfwB9gHzAf8B+gHvAekB/wH7Ae8B6wH/AdkBqwGFAf8BrgFQAQEB/wGuAVABAQH/
++        AfsB8gHtAf8B9wHkAdwB/wH1Ad0B0QH/AfQB3AHPAf8B9AHaAc0B/wHzAdgBywH/AdUBrgGbAf8BZAFK
++        ATYB/yAAAQ0CAgEOAUgCGwFRAXsCRwGGAcYB0gG7Af8BggHKAYEB/wGCAcsBggH/AbEB3QGvAf8B7AHl
++        AeEB/wHkAdoB1AH/AeMB2gHTAf8B6gHjAd4B/wHfAdUBzwH/AcgBuQGuAf8BsQGcAYwB/wGrAZYBhgH/
++        AaUBkAGAAf8BoAGJAXoB/wGaAYQBcwH/AZQBfgFuAf8BkAF5AWcB/wGLAXQBYgH/AYgBcAFdAf8B9AHc
++        AdAB/wH0AdsBzgH/AdYBsQGeAf8BZAFKATYB/xwAAZsBhAF0Af8B+gHuAegB/wH8AfcB9AH/AfwB9gHz
++        Af8B/QH4AfYB/wHZAawBhwH/Aa4BUAEBAf8BrgFQAQEB/wHpAdABugH/Af0B+AH2Af8B/AH0AfAB/wH8
++        AfUB8QH/AfgB8AHoAf8BuQFnASMB/wGuAVABAQH/AbMBWwESAf8B9QHjAdkB/wH2AeMB2gH/AfUB3gHS
++        Af8B9AHcAdAB/wH0AdsBzgH/AdYBsQGeAf8BZAFKATYB/yQAAQQCAQEEARQCAwEXATACDQE3AbsBrAGg
++        Af8B/AH0AfAB/wH9AfkB9wH/Af0B9wH0Af8B+wH1AfIB/wH7AfIB7gH/AfsB8QHsAf8B+wHvAeoB/wH6
++        Ae4B6AH/AfkB7QHmAf8B+QHrAeQB/wH5AeoB4gH/AfcB6AHgAf8B+AHmAd4B/wH3AeQB2wH/AfcB4gHZ
++        Af8B9gHhAdYB/wH1Ad8B1QH/AfUB3gHSAf8B9AHcAdAB/wH0AdsBzgH/AdYBsQGeAf8BZAFKATYB/xgA
++        AZsBhAF0Af8B+gHuAegB/wH8AfcB9AH/AfwB9QHyAf8B+wH1AfIB/wH9AfgB9QH/AdkBrAGHAf8BrgFQ
++        AQEB/wGuAVABAQH/Af0B+QH2Af8B+wHxAe0B/wH8AfMB7gH/AdkBrAGHAf8BrgFQAQEB/wGuAVABAQH/
++        AfwB9QHyAf8B+AHnAd8B/wH1Ad8B1QH/AfUB3gHSAf8B9AHcAdAB/wH0AdsBzgH/AdYBsQGeAf8BZAFK
++        ATYB/yAAATkCEQFAAXsCRwGGAYcBngFvAd0BCAGYAQgB/wEIAZgBCAH/AQgBmAEIAf8BCAGYAQgB/wEX
++        AZ4BFwH/AegB8wHlAf8B/gH7AfoB/wEIAZgBCAH/Af4B+gH5Af8B/AH0AfAB/wH8AfMB8AH/AfsB8QHs
++        Af8B+AHrAeUB/wH5AekB4QH/AfcB5wHfAf8B9wHmAd0B/wH3AeQB2gH/AfYB4gHZAf8B9gHgAdYB/wH1
++        Ad4B0wH/AfUB3QHRAf8B1wGzAaAB/wFkAUoBNgH/HAABnQGHAXcB/wH6AfEB6wH/Af0B+QH3Af8B/QH4
++        AfYB/wH+AfsB+QH/AcQBfwFFAf8BrgFQAQEB/wG+AXMBNAH/Af4B+wH5Af8B+wH0Ae8B/wH7Ae8B6wH/
++        AfoB8AHrAf8B+wHzAe8B/wHdAbQBlAH/Ab4BcgEzAf8B2AGoAYIB/wH1AeIB1wH/AfcB5QHdAf8B9gHg
++        AdYB/wH1Ad4B0wH/AfUB3QHRAf8B1wGzAaAB/wFkAUoBNgH/IAABDAICAQ0BMwIOAToBdwJDAYIBtwKQ
++        Ab8B8wHxAe8B/wH+AfsB+gH/Af4C/QH/Af4C/AH/Af0B+QH3Af8B/AH2AfMB/wH7AfQB8AH/AfsB8gHt
++        Af8B+wHxAewB/wH6Ae8B6QH/AfoB7QHoAf8B+QHsAeYB/wH4AeoB4wH/AfkB6QHhAf8B9wHnAd8B/wH3
++        AeYB3QH/AfcB5AHaAf8B9gHiAdkB/wH2AeAB1gH/AfUB3gHTAf8B9QHdAdEB/wHXAbMBoAH/AWQBSgE2
++        Af8YAAGdAYcBdwH/AfoB8QHrAf8B/QH5AfcB/wH9AfcB9QH/AfwB9wH0Af8B/QH5AfgB/wHZAa0BhwH/
++        Aa4BUAEBAf8BrgFQAQEB/wH9AfkB9wH/AfwB8wHvAf8B/AH0AfEB/wHZAawBhwH/Aa4BUAEBAf8BrgFQ
++        AQEB/wH8AfYB8wH/AfkB6gHiAf8B9gHiAdkB/wH2AeAB1gH/AfUB3gHTAf8B9QHdAdEB/wHXAbMBoAH/
++        AWQBSgE2Af8cAAETAgMBFgFVAiQBXwGeAYMBdgG9AQgBmAEIAf8BCAGYAQgB/wFkAb4BZAH/AcAB5AG/
++        Af8BRQGxAUUB/wEIAZgBCAH/AaUB2QGkAf8B/gH8AfsB/wEIAZgBCAH/AdUB6wHRAf8B/QH4AfYB/wH9
++        AfoB+AH/Af0B9wH1Af8B+wHxAe0B/wH5AesB5AH/AfgB6QHjAf8B+AHoAeAB/wH4AeYB3gH/AfcB5QHc
++        Af8B9gHjAdkB/wH2AeIB1wH/AfUB4AHVAf8B1wG1AaMB/wFkAUoBNgH/HAABnwGJAXoB/wH7AfIB7gH/
++        Af0B+wH5Af8B/gH6AfkB/wH+AfwB+wH/Aa4BUAEBAf8BrgFQAQEB/wHZAa0BiAH/Af0B+QH3Af8B/AHz
++        AfAB/wH6AfAB6wH/AfoB7wHqAf8B+gHvAesB/wH7AfEB7AH/AfsB8QHtAf8B+gHvAeoB/wH5AeoB4wH/
++        AfcB5gHeAf8B9gHjAdkB/wH2AeIB1wH/AfUB4AHVAf8B1wG1AaMB/wFkAUoBNgH/HAABBwIBAQcBOQIR
++        AUABrAKBAbUBuQGLAYMByAG3AXABRQHlAbIBWgEQAf8BrgFQAQEB/wG5AWcBIwH/AdkBrAGHAf8B/gL9
++        Af8B/QH6AfgB/wH8AfcB9AH/AfsB9AHxAf8B+wHzAe8B/wH7AfEB7QH/AfoB8AHrAf8B+gHuAekB/wH5
++        AewB5wH/AfkB6wHkAf8B+AHpAeMB/wH4AegB4AH/AfgB5gHeAf8B9wHlAdwB/wH2AeMB2QH/AfYB4gHX
++        Af8B9QHgAdUB/wHXAbUBowH/AWQBSgE2Af8YAAGfAYkBegH/AfsB8gHuAf8B/QH7AfkB/wH+AfkB9wH/
++        Af0B+QH3Af8B/QH6AfkB/wHZAa0BiAH/Aa4BUAEBAf8BrgFQAQEB/wH+AfoB+QH/AfwB9QHyAf8B/AH1
++        AfIB/wHZAawBhwH/Aa4BUAEBAf8BrgFQAQEB/wH9AfcB9AH/AfoB6wHlAf8B9wHlAdwB/wH2AeMB2QH/
++        AfYB4gHXAf8B9QHgAdUB/wHXAbUBowH/AWQBSgE2Af8cAAElAggBKgF1AkABfwF1AaYBZAHpAQgBmAEI
++        Af8BYAG5AV4B/wH9AfoB+QH/Av4B/QH/AeAB8QHfAf8BJgGkASYB/wGTAcwBjwH/AW4BvwFsAf8BCAGY
++        AQgB/wHGAdkBvQH/AeYB4AHbAf8BCAGYAQgB/wHjAdwB1gH/AcMBtQGpAf8BoAGJAXoB/wGaAYQBcwH/
++        AZQBfgFuAf8BkAF5AWcB/wGLAXQBYgH/AYgBcAFdAf8B9wHkAdsB/wH2AeIB2AH/AdkBtwGlAf8BZAFK
++        ATYB/xwAAaIBjAF8Af8B+wH0AfEB/wH+Af0B+wH/Af4B/AH7Av8C/QH/Aa4BUAEBAf8BrgFQAQEB/wHZ
++        Aa0BiAH/Af0B+QH4Af8B+wH0AfIB/wH7AfIB7gH/AfoB8QHsAf8B+gHwAesB/wH6Ae8B6gH/AfoB7gHp
++        Af8B+QHsAeYB/wH5AeoB4wH/AfgB5wHfAf8B9wHmAd0B/wH3AeQB2wH/AfYB4gHYAf8B2QG3AaUB/wFk
++        AUoBNgH/HAABHQIFASEBiwJYAZUBuAGIAXsBzAGwAVYBDgH7Aa4BUAEBAf8BtgFkAR8B/wHDAX4BRAH/
++        Aa4BUAEBAf8BrgFQAQEB/wHUAaEBdwH/Af4C/QH/Af0B+gH3Af8B/QH2AfMB/wH8AfYB9AH/AfwB9gH0
++        Af8B/AH2AfMB/wH7AfQB8AH/AfoB8AHrAf8B+gHtAegB/wH5Ae0B5wH/AfkB7QHnAf8B+wHvAeoB/wH6
++        Ae4B6QH/AfkB6wHkAf8B9wHlAd0B/wH2AeIB2AH/AdkBtwGlAf8BZAFKATYB/xgAAaIBjAF8Af8B+wH0
++        AfEB/wH+Af0B+wH/Af4B+wH6Af8B/gH7AfoB/wH+AfwB+gH/AdkBrQGIAf8BrgFQAQEB/wGuAVABAQH/
++        Af4C/AH/Af0B+AH1Af8B/QH4AfYB/wHZAa0BiAH/Aa4BUAEBAf8BrgFQAQEB/wH9AfgB9QH/AfoB7gHo
++        Af8B+AHnAd8B/wH3AeYB3QH/AfcB5AHbAf8B9gHiAdgB/wHZAbcBpQH/AWQBSgE2Af8cAAElAggBKgF1
++        AkABfwF1AaYBZAHpAQgBmAEIAf8BfAHCAXkB/wH9AfoB+QL/Av0B/wL+Af0C/wL9Av8B/gH9Af8BCAGY
++        AQgB/wEIAZgBCAH/AXIBwwFxAf8B/gH8AfsB/wEIAZgBCAH/AdUB6wHRAf8B/QH2AfQB/wH6AfEB7AH/
++        AfoB7gHpAf8B+gHtAecB/wH5AesB5AH/AfgB6gHjAf8B+AHoAeEB/wH4AecB3gH/AfcB5QHcAf8B2gG5
++        AacB/wFkAUoBNgH/HAABpAGOAX8B/wH8AfYB8wL/Av0B/wH+Av0C/wL9Af8BrgFQAQEB/wGuAVABAQH/
++        AdkBrQGIAf8B/gH7AfkB/wH8AfYB9AH/AfwB9QHxAf8B+wHzAe8B/wH7AfIB7gH/AfsB8gHuAf8B+wHx
++        Ae0B/wH7AfAB6wH/AfoB7QHmAf8B+AHrAeQB/wH4AegB4QH/AfgB5wHeAf8B9wHlAdwB/wHaAbkBpwH/
++        AWQBSgE2Af8YAAECAwEBPgIUAUYBtwKQAb8BtAFmATAB7gGuAVABAQH/AbcBeQFZAd0B9AHyAfAB/wH+
++        Af0B/AH/Ae8B2wHLAf8BrgFQAQEB/wGuAVABAQH/AfQB5wHbAf8B/gH8AfsB/wH9AfoB+AH/Af4B+wH5
++        Af8B/gL8Af8B/gH8AfsB/wH+AfsB+gH/AfwB9AHxAf8B+gHwAesB/wH7AfAB7AH/AfwB9gHzAf8B/QH6
++        AfgB/wH9AfoB+AH/Af0B+AH2Af8B+QHsAeUB/wH3AeUB3AH/AdoBuQGnAf8BZAFKATYB/xgAAaQBjgF/
++        Af8B/AH2AfMC/wL9Af8B/gH9AfwB/wH+AvsB/wH+Af0B/AH/AdkBrQGIAf8BrgFQAQEB/wGuAVABAQH/
++        AekB0AG7Af8B/gH8AfsB/wH+AvwB/wHUAaEBeAH/Aa4BUAEBAf8BrgFQAQEB/wH9AfgB9gH/AfoB7wHp
++        Af8B+AHqAeMB/wH4AegB4QH/AfgB5wHeAf8B9wHlAdwB/wHaAbkBpwH/AWQBSgE2Af8cAAElAggBKgF1
++        AkABfwF1AaYBZAHpAQgBmAEIAf8BfAHCAXkB/wH+AfsB+gX/A/4C/wL+Av8C/gH/AXIBwwFxAf8BCAGY
++        AQgB/wEIAZgBCAH/AXIBwwFxAf8BCAGYAQgB/wHVAesB0gH/Af0B+AH2Af8B+wHzAfAB/wH7AfEB7AH/
++        AfoB7wHqAf8B+gHuAegB/wH5Ae0B5gH/AfkB6gHkAf8B+AHpAeIB/wH4AecB3wH/AdsBugGqAf8BZAFK
++        ATYB/xwAAaYBkQGBAf8B/QH4AfYF/wL+Af0C/wL+Af8BvgFzATQB/wGuAVABAQH/AckBigFWAf8B/gH9
++        AfwB/wH9AfoB9wH/AfwB9gH1Af8B/AH3AfMB/wH9AfYB8wH/AfgB7AHlAf8B8gHhAdQB/wH8AfYB8wH/
++        AfsB8gHtAf8B+QHuAegB/wH5AeoB5AH/AfgB6QHiAf8B+AHnAd8B/wHbAboBqgH/AWQBSgE2Af8YAAEJ
++        AgEBCgFiAi8BbAG4AY0BiQHDAa4BUAEBAf8BsAFWAQ4B+wG3ApABvwHkAd4B2gH/Af4B+wH6Bf8BzgGV
++        AWcB/wHEAX8BRQH/AekBzwG6Av8B/gH9Av8B/QH8Af8B/gL9Af8BwwF+AUQB/wGuAVABAQH/Af4B/QH8
++        Af8B/gH6AfkB/wH8AfYB8wH/Af0B+AH2Af8B/gH7AfoB/wHDAX4BQwH/Aa4BUAEBAf8B/QH6AfgB/wH8
++        AfYB8wH/AfkB7AHmAf8B3QG+Aa8B/wFkAUoBNgH/GAABpgGRAYEB/wH9AfgB9gX/Av4B/QL/Av0B/wH+
++        Av0B/wHZAa0BiAH/Aa4BUAEBAf8BrgFQAQEB/wG+AXMBNAH/AeQBxAGqAf8B5AHEAaoB/wGzAVwBEgH/
++        Aa4BUAEBAf8BuQFnASMB/wH9AfcB9QH/AfsB8QHsAf8B+QHtAeYB/wH5AeoB5AH/AfgB6QHiAf8B+AHn
++        Ad8B/wHbAboBqgH/AWQBSgE2Af8cAAEgAgYBJQFvAjoBeQF/AaQBawHkAQgBmAEIAf8BYAG5AV4C/wL8
++        Bf8B7wH5Ae8B/wFkAb4BZAH/AcMB5gHDAv8C/gH/AQgBmAEIAf8BcgHDAXEB/wEIAZgBCAH/AQgBmAEI
++        Af8BcgHDAXEB/wH+AfsB+QH/Af0B9wH1Af8B+wHzAe8B/wH7AfIB7QH/AfoB8QHrAf8B+gHuAeoB/wH5
++        Ae0B5wH/AfkB7AHlAf8B+QHrAeMB/wHbAbwBrAH/AWQBSgE2Af8cAAGqAZQBhAH/Af4B+QH4Cf8B/gH/
++        Af4B/wHUAaEBeAH/Aa4BUAEBAf8BrgFQAQEB/wH0AegB3QL/AvwB/wH+AfoB+QH/Af4B+wH4Af8B/gH7
++        AfoB/wHZAawBhwH/Aa4BUAEBAf8BswFcARIB/wHyAeEB0wH/AfsB8AHtAf8B+QHtAecB/wH5AewB5QH/
++        AfkB6wHjAf8B2wG8AawB/wFkAUoBNgH/GAABEwIDARUBfQJJAYgBuQGFAXMB0AGuAVABAQH/AbQBZgEw
++        Ae4BtwKQAb8BxAG0AakB/wH+AfoB+RL/Av4C/wL+Av8C/gH/AcQBfgFEAf8BrgFQAQEB/wH+Af0B/AH/
++        Af4B/QH8Af8B/gH8AfsB/wH+AfwB+wH/Af4B/AH6Af8BwwF+AUQB/wGuAVABAQH/Af0B+gH5Af8B/QH6
++        AfgB/wH9AfkB9gH/AeIBygG9Af8BZAFKATYB/xgAAaoBlAGEAf8B/gH5AfgJ/wH+Af8B/gH/A/4B/wHZ
++        Aa0BiAH/Aa4BUAEBAf8BrgFQAQEB/wG+AXMBNAH/Aa4BUAEBAf8BrgFQAQEB/wGuAVABAQH/Aa4BUAEB
++        Af8B2QGsAYYB/wH8AfcB9AH/AfoB8gHtAf8B+gHuAeoB/wH5Ae0B5wH/AfkB7AHlAf8B+QHrAeMB/wHb
++        AbwBrAH/AWQBSgE2Af8cAAEPAgIBEQFVAiQBXwGeAYMBdgG9AQgBmAEIAf8BCAGYAQgB/wFkAb4BZAH/
++        AbEB3wGxAf8BVQG4AVUB/wEIAZgBCAH/AZQB0wGUAf8BcgHEAXIB/wEIAZgBCAL/Av4B/wFyAcQBcQH/
++        AQgBmAEIAf8BCAGYAQgB/wH+Af0B/AH/Af0B+gH4Af8B/AH1AfIB/wH7AfQB8AH/AfwB8wHvAf8B+gHx
++        Ae0B/wH7AfAB6gH/AfoB7gHpAf8B+QHsAecB/wHcAb4BrgH/AWQBSgE2Af8cAAGsAZYBhwH/Af4B+wH6
++        Df8B9AHoAd0B/wGzAVwBEgH/Aa4BUAEBAf8BvgFzATQB/wHkAcQBqgL/Av4B/wH6AfIB7QH/AdkBrQGI
++        Af8BrgFQAQEB/wGuAVABAQH/AcMBfgFEAf8B/QH4AfYB/wH7AfMB7wH/AfsB8AHqAf8B+gHuAekB/wH5
++        AewB5wH/AdwBvgGuAf8BZAFKATYB/xgAARMCAwEWAYECTAGLAbkBhQFzAdABrgFQAQEB/wG0AWYBMAHu
++        AbcCkAG/AcQBtAGpAf8B/gH7AfoV/wGuAVABAQH/Aa4BUAEBAf8BrgFQAQEB/wGuAVABAQH/Aa4BUAEB
++        Af8BrgFQAQEB/wH+Af0B/AH/Aa4BUAEBAf8BrgFQAQEB/wGuAVABAQH/Aa4BUAEBAf8BrgFQAQEB/wGu
++        AVABAQH/Af0B+gH5Af8B5wHSAccB/wFkAUoBNgH/GAABrAGWAYcB/wH+AfsB+hH/AdkBrQGIAf8BrgFQ
++        AQEB/wGuAVABAQX/AdkBrQGIAf8BxAF/AUUB/wHJAYkBVgH/Ad4BtwGXAf8B/QH6AfgB/wH8AfYB8wH/
++        AfwB9AHwAf8B+gHxAe0B/wH7AfAB6gH/AfoB7gHpAf8B+QHsAecB/wHcAb4BrgH/AWQBSgE2Af8gAAE5
++        AhEBQAF7AkcBhgGHAZ4BbwHdAQgBmAEIAf8BCAGYAQgB/wEIAZgBCAH/AQgBmAEIAf8BCAGYAQgB/wHB
++        AeUBwQH/AQgBmAEIAf8BCAGYAQgB/wFyAcQBcgL/Av4B/wEIAZgBCAH/AXIBwwFxAv8B/QH8Af8B/gH7
++        AfgB/wH9AfcB9QH/AfwB9gHzAf8B/AH1AfEB/wH8AfMB8AH/AfsB8gHuAf8B+wHwAewB/wH6Ae8B6QH/
++        Ad0BwQGxAf8BZAFKATYB/xwAAa4BmQGKAf8B/gL8Ef8B3wG5AZkB/wGuAVABAQH/Aa4BUAEBAf8BrgFQ
++        AQEB/wGuAVABAQH/Aa4BUAEBAf8BrgFQAQEB/wGuAVABAQH/AbMBXAESAf8B7gHZAckB/wH9AfgB9QH/
++        AfwB9AHxAf8B+wHyAe4B/wH7AfAB7AH/AfoB7wHpAf8B3QHBAbEB/wFkAUoBNgH/GAABDAICAQ0BawI3
++        AXYBuQGLAYMByAGuAVABAQH/AbEBWwEZAfYBtwKQAb8B3QHUAc4B/wH+Av0F/wH0AegB3Q3/AcQBfwFF
++        Af8BxAF/AUUB/wGzAVwBEgH/Aa4BUAEBAf8BwwF/AUUB/wHEAX8BRAL/Av0B/wHDAX4BRAH/AcMBfgFE
++        Af8BswFcARIB/wGuAVABAQH/AcMBfgFEAf8BwwF+AUQB/wH+AfsB+QH/AeYB0QHFAf8BZAFKATYB/xgA
++        Aa4BmQGKAf8B/gL8Ef8B2QGtAYgB/wGuAVABAQH/Aa4BUAEBBv8B/gH9Af8B/gH9AfwB/wH+AfwB+wH/
++        Af4B+wH5Af8B/QH4AfcB/wH8AfcB9AH/AfwB9QHxAf8B/AHzAfAB/wH7AfIB7gH/AfsB8AHsAf8B+gHv
++        AekB/wHdAcEBsQH/AWQBSgE2Af8gAAENAgIBDgFIAhsBUQF7AkcBhgHMAdgBwgH/AZIB0gGSAf8BgwHL
++        AYMB/wGDAcsBgwH/AeAB8gHgBf8BcgHEAXIB/wEIAZgBCAH/AQgBmAEIAf8BcgHEAXIB/wEIAZgBCAL/
++        Av4B/wH+Af0B/AH/Af0B+wH6Af8B/QH6AfgB/wH9AfgB9gH/AfwB9wH0Af8B/AH2AfMB/wH8AfQB8QH/
++        AfsB8wHvAf8B+wHxAe0B/wHfAcIBswH/AWQBSgE2Af8cAAGxAZwBjQL/Af4B/RX/Ae8B3AHMAf8BxAF/
++        AUUB/wGuAVABAQH/Aa4BUAEBAf8BrgFQAQEB/wGuAVABAQH/AcQBfwFFAf8B7gHaAcoB/wH+AfsB+QH/
++        AfwB+AH2Af8B/AH2AfMB/wH8AfQB8QH/AfsB8wHvAf8B+wHxAe0B/wHfAcIBswH/AWQBSgE2Af8YAAED
++        AgEBAwFJAhsBUgG3ApABvwGxAVsBGQH2Aa4BUAEBAf8BuAGBAWoB1AH2AfMB8QP/Af4F/wG+AXMBNAH/
++        Aa4BUAEBAf8B5AHEAaoN/wHEAX8BRQH/Aa4BUAEBAv8C/gL/Av4B/wL+Af0B/wL+Af0B/wH+Av0B/wHD
++        AX4BRAH/Aa4BUAEBAf8B/gH8AfsB/wH+AfwB+wH/Af0B+AH2Af8B4wHKAb0B/wFkAUoBNgH/GAABsQGc
++        AY0C/wH+Af0R/wHZAa0BiAH/Aa4BUAEBAf8BrgFQAQEF/wP+Af8B/gH9AfwB/wH+AvsB/wH9AfsB+QH/
++        Af0B+gH4Af8B/QH4AfYB/wH8AfcB9AH/AfwB9gHzAf8B/AH0AfEB/wH7AfMB7wH/AfsB8QHtAf8B3wHC
++        AbMB/wFkAUoBNgH/JAABDQICAQ4BOQIRAUABzwHCAbkZ/wEIAZgBCAH/AXIBxAFyAf8BCAGYAQgB/wEI
++        AZgBCAH/AXIBxAFyAv8C/gH/Af4B/QH8Af8B/gH7AfoB/wH9AfoB+AH/Af0B+QH3Af8B/AH4AfUB/wH8
++        AfcB8wH/AfwB9QHxAf8B+wHzAfAB/wHfAcQBtgH/AWQBSgE2Af8cAAGzAZ4BjyH/AfoB8wHuAf8B6QHQ
++        AbsB/wHpAdABuwH/AfoB8gHtAf8B/gL9Af8B/gL8Af8B/QH7AfkB/wH9AfkB9wH/AfwB+AH1Af8B/AH3
++        AfMB/wH8AfUB8QH/AfsB8wHwAf8B3wHEAbYB/wFkAUoBNgH/HAABJQIIASoBoAJyAaoBuQGFAXMB0AGu
++        AVABAQH/Aa4BUAEBAf8BygGQAWEB/wHZAa0BiAH/AbkBZwEjAf8BrgFQAQEB/wGzAVwBEgH/AfoB8wHu
++        Df8BxAF/AUUB/wGuAVABAQP/Af4C/wL+Af8B/gH9AfwB/wH+Af0B/AH/Av4B/QH/AcMBfgFEAf8BrgFQ
++        AQEB/wH+Af0B/AH/Af4B+gH4Af8B/AH1AfIB/wHgAcYBuAH/AWQBSgE2Af8YAAGzAZ4BjxX/AdkBrQGI
++        Af8BrgFQAQEB/wGuAVABAQX/Av4C/wL+Af0C/wH9AfwB/wH+AfwB+wH/Af4B+wH6Af8B/QH6AfgB/wH9
++        AfkB9wH/AfwB+AH1Af8B/AH3AfMB/wH8AfUB8QH/AfsB8wHwAf8B3wHEAbYB/wFkAUoBNgH/LAABugGm
++        AZkZ/wEIAZgBCAH/AdUB7gHVAf8BcgHEAXIB/wEIAZgBCAH/AQgBmAEIBv8C/gH/Af4B/QH8Af8B/gH8
++        AfsB/wH+AfsB+QH/Af4B+gH4Af8B/QH4AfcB/wH9AfcB9AH/AfwB9gHzAf8B4AHHAbgB/wFkAUoBNgH/
++        HAABtQGgAZIv/wH+Av8B/gH9Af8B/gH9AfwB/wH+AfwB+wH/Af4B+wH5Af8B/gH6AfgB/wH9AfgB9wH/
++        Af0B9wH0Af8B/AH2AfMB/wHgAccBuAH/AWQBSgE2Af8cAAEJAgEBCgFBAhYBSQG3ApABvwG4AYEBagHU
++        AbEBWwEZAfYBrgFQAQEB/wGuAVABAQH/Aa4BUAEBAf8BvgFzATQB/wHvAdwBzB//Af4C/wH+Af0B/wH+
++        Af0B/AH/Af4C/QL/Af4B/QL/Af4B/QH/Af4B/QH8Af8B/QH5AfYB/wH8AfYB8wH/AeABxwG4Af8BZAFK
++        ATYB/xgAAbUBoAGSL/8B/gL/Af4B/QH/Af4B/QH8Af8B/gH8AfsB/wH+AfsB+QH/Af4B+gH4Af8B/QH4
++        AfcB/wH9AfcB9AH/AfwB9gHzAf8B4AHHAbgB/wFkAUoBNgH/LAABuAGjAZQZ/wEIAZgBCAH/AdUB7gHV
++        Bf8BCAGYAQgB/wFyAcQBcgf/Af4B/wP+Av8C/QL/AfwB+wH/Af4B/AH6Af8ByQG0AakB/wG9AaUBlwH/
++        AbIBmQGJAf8BpAGKAXkB/wFkAUoBNgH/HAABuAGjAZQz/wH+Af8D/gL/Av0C/wH8AfsB/wH+AfwB+gH/
++        AckBtAGpAf8BvQGlAZcB/wGyAZkBiQH/AaQBigF5Af8BZAFKATYB/yAAAQ0CAgEOAUECFgFJAaACcgGq
++        AbcCkAG/AekB1QHEAf8B6QHQAbsB/wHvAdwBzCv/Af4B/wP+Av8C/QL/Af0B/AH/Af4B/QH8Af8B1AHD
++        AbsB/wHBAaoBnQH/AbIBmQGJAf8BpAGKAXkB/wFkAUoBNgH/GAABuAGjAZQz/wH+Af8D/gL/Av0C/wH8
++        AfsB/wH+AfwB+gH/AckBtAGpAf8BvQGlAZcB/wGyAZkBiQH/AaQBigF5Af8BZAFKATYB/ywAAboBpgGY
++        Hf8B1QHuAdUF/wEIAZgBCAH/AdUB7gHVDv8C/gH/Av4B/QH/AZ4BhwF3Af8BZAFKATYB/wFkAUoBNgH/
++        AWQBSgE2Af8BZAFKATYB/wFkAUoBNgH/HAABugGmAZg6/wL+Af8C/gH9Af8BngGHAXcB/wFkAUoBNgH/
++        AWQBSgE2Af8BZAFKATYB/wFkAUoBNgH/AWQBSgE2Af8kAAEJAgEBCgElAggBKgFMAh0BVQHoAeEB3Tr/
++        Av4B/wL+Af0B/wGeAYcBdwH/AWQBSgE2Af8BZAFKATYB/wFkAUoBNgH/AWQBSgE2Af8BZAFKATYB/xgA
++        AboBpgGYOv8C/gH/Av4B/QH/AZ4BhwF3Af8BZAFKATYB/wFkAUoBNgH/AWQBSgE2Af8BZAFKATYB/wFk
++        AUoBNgH/LAABvAGoAZol/wEIAZgBCAH/AdUB7gHVFf8BoAGJAXoB/wHVAcUBvQH/AccBsQGlAf8BuQGh
++        AZIB/wFtAVMBPwH/AWMBOQEpAd4cAAG8AagBmkH/AaABiQF6Af8B1QHFAb0B/wHHAbEBpQH/AbkBoQGS
++        Af8BbQFTAT8B/wFaAR8BFwGjLAABBAIBAQQBwAGtAaBB/wGgAYkBegH/AdUBxQG9Af8BxwGxAaUB/wG5
++        AaEBkgH/AW0BUwE/Af8BWgEfARcBoxgAAbwBqAGaQf8BoAGJAXoB/wHVAcUBvQH/AccBsQGlAf8BuQGh
++        AZIB/wFtAVMBPwH/AVoBHwEXAaMsAAG+AaoBnCn/AdUB7gHVFf8BogGMAX0B/wHjAdoB0wH/AdUBxQG8
++        Af8BegFhAU0B/wFqAT8BMAHeIAABvgGqAZxB/wGiAYwBfQH/AeMB2gHTAf8B1QHFAbwB/wF6AWEBTQH/
++        AV0BIgEaAaM0AAG+AaoBnEH/AaIBjAF9Af8B4wHaAdMB/wHVAcUBvAH/AXoBYQFNAf8BXQEiARoBoxwA
++        Ab4BqgGcQf8BogGMAX0B/wHjAdoB0wH/AdUBxQG8Af8BegFhAU0B/wFdASIBGgGjMAABwAGtAZ9B/wGl
++        AY4BfwH/AfMB7wHtAf8BiAFxAV4B/wFzAUoBOgHeJAABwAGtAZ9B/wGlAY4BfwH/AfMB7wHtAf8BiAFx
++        AV4B/wFiASgBIAGjOAABwAGtAZ9B/wGlAY4BfwH/AfMB7wHtAf8BiAFxAV4B/wFiASgBIAGjIAABwAGt
++        AZ9B/wGlAY4BfwH/AfMB7wHtAf8BiAFxAV4B/wFiASgBIAGjNAABwgGvAaES/wH9AfwB/wH+AvsB/wH9
++        AfkB+AH/Af0B+AH1Af8B/AH1AfIB/wH7AfMB7wH/AfsB8QHsAf8B+gHtAegB/wH5AesB5AH/AfgB6QHi
++        Af8B9wHnAd0B/wH3AeQB2wH/AacBkQGCAf8BlgGAAW8B/wF/AVYBRwHeKAABwgGvAaES/wH9AfwB/wH+
++        AvsB/wH9AfkB+AH/Af0B+AH1Af8B/AH1AfIB/wH7AfMB7wH/AfsB8AHrAf8B+gHtAegB/wH5AesB5AH/
++        AfgB6QHiAf8B9wHnAd0B/wH3AeQB2wH/AacBkQGCAf8BlgGAAW8B/wFpAS8BJwGjPAABwgGvAaES/wH9
++        AfwB/wH+AvsB/wH9AfkB+AH/Af0B+AH1Af8B/AH1AfIB/wH7AfMB7wH/AfsB8AHrAf8B+gHtAegB/wH5
++        AesB5AH/AfgB6QHiAf8B9wHnAd0B/wH3AeQB2wH/AacBkQGCAf8BlgGAAW8B/wFpAS8BJwGjJAABwgGv
++        AaES/wH9AfwB/wH+AvsB/wH9AfkB+AH/Af0B+AH1Af8B/AH1AfIB/wH7AfMB7wH/AfsB8AHrAf8B+gHt
++        AegB/wH5AesB5AH/AfgB6QHiAf8B9wHnAd0B/wH3AeQB2wH/AacBkQGCAf8BlgGAAW8B/wFpAS8BJwGj
++        OAABxQGxAaMB/wHDAa8BoQH/AcIBrgGgAf8BwAGsAZ8B/wG/AasBnAH/Ab0BqQGbAf8BvAGnAZoB/wG7
++        AaYBlwH/AbgBpAGVAf8BtwGiAZQB/wG2AaEBkgH/AbMBnwGQAf8BsgGdAY8B/wGwAZsBjQH/Aa4BmgGL
++        Af8BrQGYAYgB/wGrAZYBhwH/AakBlAGEAf8BigFhAVQB3iwAAcUBsQGjAf8BwwGvAaEB/wHCAa4BoAH/
++        AcABrAGfAf8BvwGrAZwB/wG9AakBmwH/AbwBpwGaAf8BuwGmAZcB/wG4AaQBlQH/AbcBogGUAf8BtgGh
++        AZIB/wGzAZ8BkAH/AbIBnQGPAf8BsAGbAY0B/wGuAZoBiwH/Aa0BmAGIAf8BqwGWAYcB/wGpAZQBhAH/
++        AW8BNQEuAaNAAAHFAbEBowH/AcMBrwGhAf8BwgGuAaAB/wHAAawBnwH/Ab8BqwGcAf8BvQGpAZsB/wG8
++        AacBmgH/AbsBpgGXAf8BuAGkAZUB/wG3AaIBlAH/AbYBoQGSAf8BswGfAZAB/wGyAZ0BjwH/AbABmwGN
++        Af8BrgGaAYsB/wGtAZgBiAH/AasBlgGHAf8BqQGUAYQB/wFvATUBLgGjKAABxQGxAaMB/wHDAa8BoQH/
++        AcIBrgGgAf8BwAGsAZ8B/wG/AasBnAH/Ab0BqQGbAf8BvAGnAZoB/wG7AaYBlwH/AbgBpAGVAf8BtwGi
++        AZQB/wG2AaEBkgH/AbMBnwGQAf8BsgGdAY8B/wGwAZsBjQH/Aa4BmgGLAf8BrQGYAYgB/wGrAZYBhwH/
++        AakBlAGEAf8BbwE1AS4Bo/8A/wAmAAFCAU0BPgcAAT4DAAEoAwABgAMAAUADAAEBAQABAQYAAQQWAAP/
++        /wD/AAMAEP8B/AIAAQcB8AIAAR8B/gIAAQMB8AIAAR8B/AIAAQcB8AIAAR8B/gIAAQMB8AIAAR8B/AIA
++        AQcB8AIAAR8B/gIAAQMB8AIAAR8B/AIAAQcB8AIAAR8B/gIAAQMB8AIAAR8B/AIAAQcB8AIAAR8B/gIA
++        AQMB8AIAAR8B/AIAAQcB8AIAAR8B/gIAAQMB8AIAAR8B/AIAAQcB8AIAAR8B/gIAAQMB8AIAAR8B/AIA
++        AQcB8AIAAR8B/gIAAQMB8AIAAR8B/AIAAQcB8AIAAR8B/gIAAQMB8AIAAR8B/AIAAQcB8AIAAR8B/gIA
++        AQMB8AIAAR8B8AIAAQcB8AIAAR8B/gIAAQMB8AIAAR8B4AIAAQcB8AIAAR8B8AIAAQMB8AIAAR8B4AIA
++        AQcB8AIAAR8B4AIAAQMB8AIAAR8BwAIAAQcB8AIAAR8BwAIAAQMB8AIAAR8BwAIAAQcB8AIAAR8BwAIA
++        AQMB8AIAAR8BwAIAAQcB8AIAAR8BgAIAAQMB8AIAAR8BwAIAAQcB8AIAAR8BgAIAAQMB8AIAAR8BwAIA
++        AQcB8AIAAR8BgAIAAQMB8AIAAR8BwAIAAQcB8AIAAR8BgAIAAQMB8AIAAR8B4AIAAQcB8AIAAR8BgAIA
++        AQMB8AIAAR8B4AIAAQcB8AIAAR8BgAIAAQMB8AIAAR8B8AIAAQcB8AIAAR8BwAIAAQMB8AIAAR8B/AIA
++        AQcB8AIAAR8BwAIAAQMB8AIAAR8B/AIAAQcB8AIAAR8B4AIAAQMB8AIAAR8B/AIAAQcB8AIAAR8B8AIA
++        AQMB8AIAAR8B/AIAAQcB8AIAAR8B/AIAAQMB8AIAAR8B/AIAAQ8B8AIAAT8B/gIAAQcB8AIAAT8B/AIA
++        AR8B8AIAAX8B/gIAAQ8B8AIAAX8B/AIAAT8B8AIAAf8B/gIAAR8B8AIAAf8B/AIAAX8B8AEAAQEB/wH+
++        AgABPwHwAQABARH/Cw==
++</value>
++  </data>
++  <metadata name="mSmallImageList.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
++    <value>155, 17</value>
++  </metadata>
++  <data name="mSmallImageList.ImageStream" mimetype="application/x-microsoft.net.object.binary.base64">
++    <value>
++        AAEAAAD/////AQAAAAAAAAAMAgAAAFdTeXN0ZW0uV2luZG93cy5Gb3JtcywgVmVyc2lvbj0yLjAuMC4w
++        LCBDdWx0dXJlPW5ldXRyYWwsIFB1YmxpY0tleVRva2VuPWI3N2E1YzU2MTkzNGUwODkFAQAAACZTeXN0
++        ZW0uV2luZG93cy5Gb3Jtcy5JbWFnZUxpc3RTdHJlYW1lcgEAAAAERGF0YQcCAgAAAAkDAAAADwMAAABy
++        FwAAAk1TRnQBSQFMAgEBBAEAAQkBAAEEAQABEAEAARABAAT/ASEBAAj/AUIBTQE2BwABNgMAASgDAAFA
++        AwABIAMAAQEBAAEgBgABIP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8ALgABtwGiAZMB/wFk
++        AUoBNgH/AWQBSgE2Af8BZAFKATYB/wFkAUoBNgH/AWQBSgE2Af8BZAFKATYB/wFkAUoBNgH/AWQBSgE2
++        Af8BZAFKATYB/wFkAUoBNgH/AWQBSgE2Af/QAAG3AaIBkwH/AfcB5QHcAf8BtwGiAZMB/wG3AaIBkwH/
++        AbcBogGTAf8BtwGiAZMB/wG3AaIBkwH/AbcBogGTAf8BtwGiAZMB/wG3AaIBkwH/AbcBogGTAf8BZAFK
++        ATYB/wwAAbcBogGTAf8BZAFKATYB/wFkAUoBNgH/AWQBSgE2Af8BZAFKATYB/wFkAUoBNgH/AWQBSgE2
++        Af8BZAFKATYB/wFkAUoBNgH/AWQBSgE2Af8BZAFKATYB/wFkAUoBNgH/GAABtwGiAZMB/wFkAUoBNgH/
++        AWQBSgE2Af8BZAFKATYB/wFkAUoBNgH/AWQBSgE2Af8BZAFKATYB/wFkAUoBNgH/AWQBSgE2Af8BZAFK
++        ATYB/wFkAUoBNgH/AWQBSgE2Af8IAAG3AaIBkwH/AWQBSgE2Af8BZAFKATYB/wFkAUoBNgH/AWQBSgE2
++        Af8BZAFKATYB/wFkAUoBNgH/AWQBSgE2Af8BZAFKATYB/wFkAUoBNgH/AWQBSgE2Af8BZAFKATYB/xQA
++        AbcBogGTAf8B+QHpAeIB/wH4AeYB3QH/AfcB4gHYAf8B9QHeAdMB/wH0AdsBzgH/AfMB1wHKAf8B8gHU
++        AcUB/wHxAdABwQH/AfABzQG8Af8BtwGiAZMB/wFkAUoBNgH/DAABtwGiAZMB/wH3AeUB3AH/AbcBogGT
++        Af8BtwGiAZMB/wG3AaIBkwH/AbcBogGTAf8BtwGiAZMB/wG3AaIBkwH/AbcBogGTAf8BtwGiAZMB/wG3
++        AaIBkwH/AWQBSgE2Af8YAAG3AaIBkwH/AfcB5QHcAf8B2AHHAb8B/wHVAcQBvAH/AdIBwAG3Af8BzwG9
++        AbMB/wHNAbkBrwH/AcsBtgGrAf8ByAGzAagB/wHGAa8BowH/AcMBrAGgAf8BZAFKATYB/wgAAbcBogGT
++        Af8B8wHWAckB/wHxAdEBwgH/AfABzQG8Af8B7wHJAbcB/wHuAcYBswH/Ae0BwwGvAf8B7QHDAa8B/wHt
++        AcMBrwH/Ae0BwwGvAf8B7QHDAa8B/wFkAUoBNgH/FAABtwGiAZMB/wH5Ae4B6AH/Ab4BqgGcAf8BtQGh
++        AZMB/wGsAZcBiAH/AaIBjQF+Af8BmgGDAXMB/wGRAXsBagH/AYoBdAFiAf8B8QHRAcIB/wG3AaIBkwH/
++        AWQBSgE2Af8MAAG3AaIBkwH/AfkB6QHiAf8B+AHnAd4B/wH4AeQB2wH/AfYB4gHZAf8B9gHhAdYB/wH1
++        Ad0B0gH/AfMB2AHKAf8B8gHSAcMB/wHwAc0BvQH/AbcBogGTAf8BZAFKATYB/wwAAQIDAQEEAgEBBAEI
++        AgEBCAG5AaUBlgH/AfkB6gHjAf8B+AHmAd0B/wH3AeIB2AH/AfUB3gHTAf8B9AHbAc4B/wHzAdcBygH/
++        AfIB1AHFAf8B8QHQAcEB/wHwAc0BvAH/AccBsQGlAf8BZAFKATYB/wgAAbcBogGTAf8B+QHpAeIB/wH4
++        AecB3gH/AfcB5AHaAf8B9gHhAdcB/wH1Ad4B0gH/AfQB2wHPAf8B8wHYAcoB/wHyAdMBxQH/AfEBzwG+
++        Af8B7QHDAa8B/wFkAUoBNgH/FAABtwGiAZMB/wH7AfIB7QH/AfoB7gHpAf8B+QHqAeQB/wH4AecB4AH/
++        AfcB5AHaAf8B9gHhAdUB/wH1AdwB0QH/AfQB2AHMAf8B8wHVAccB/wG3AaIBkwH/AWQBSgE2Af8MAAG3
++        AaIBkwH/AfkB7gHpAf8B+QHsAeYB/wH6AewB5gH/AfoB7QHmAf8B+QHsAecB/wH5AekB4gH/AfYB4wHa
++        Af8B9AHbAc4B/wHyAdMBxQH/AbcBogGTAf8BZAFKATYB/wgAAQUCAQEFARECAgETASUCCAEqATcCEAE+
++        Ac8BwQG4Af8B+gHyAe0B/wH5Ae0B5gH/AfgB5wHgAf8B9wHjAdkB/wH1Ad8B1QH/AfUB2wHQAf8B8wHY
++        AcsB/wHyAdUBxgH/AfEB0QHCAf8BygG1AaoB/wFkAUoBNgH/CAABtwGiAZMB/wH5Ae4B6AH/AfgB6wHl
++        Af8B+QHqAeMB/wH5AeoB4wH/AfgB6AHhAf8B+AHlAd0B/wH2AeMB2QH/AfUB3QHRAf8B8wHWAckB/wHt
++        AcQBsQH/AWQBSgE2Af8IAAEfAgYBIwFvAjoBeQGyAogBugHsAeYB4gH/Af4B+wH6Af8B5AHbAdUB/wHd
++        AdQBzgH/AcIBsgGnAf8BpQGRAYIB/wGaAYMBcwH/AZEBewFqAf8BigF0AWIB/wHzAdoBzQH/AbcBogGT
++        Af8BZAFKATYB/wwAAbcBogGTAf8B+wHzAe8B/wH7AfIB7wH/AeMBzwHBAf8BoAFtAUQB/wF/ATsBAwH/
++        AY8BVAEjAf8ByAGlAYsB/wH3AeIB2QH/AfQB2QHMAf8BtwGiAZMB/wFkAUoBNgH/CAABFAIDARcBNQIP
++        ATwBYgIvAWwBkQFUAUoBpQHmAcwBtQH/AfgB7gHmAf8B/AH0AfEB/wH6Ae4B6QH/AfgB6AHiAf8B9wHk
++        AdoB/wH2AeEB1QH/AfUB3AHSAf8B9AHZAc0B/wHzAdUByAH/Ac0BuwGwAf8BZAFKATYB/wgAAbcBogGT
++        Af8B+wHyAe0B/wH7AfAB7AH/AfsB8QHtAf8BrgFQAQEB/wHmAccBrwH/AfsB8QHsAf8BrgFQAQEB/wHk
++        Ab8BpQH/AfYB3gHTAf8B7gHFAbIB/wFkAUoBNgH/CAABbwI6AXkB2AHdAdIB9gEBAZkBAQH/AQEBmQEB
++        Af8B4gHuAeIB/wH7Af0B+wH/AQYBlwEGAf8B0AHiAc8B/wH9AfcB9AH/AfoB7gHoAf8B9wHlAd4B/wH2
++        AeIB2AH/AfUB3wHTAf8BtwGiAZMB/wFkAUoBNgH/DAABuAGjAZUB/wH9AfgB9QH/Af0B9wH1Af8BjwFV
++        ASQB/wHCAaABhQH/Af0B+AH1Af8BygGqAZEB/wF/ATsBAwH/Ae8B2wHQAf8B9AHeAdIB/wG3AaIBkwH/
++        AWQBSgE2Af8IAAEwAg0BNwF3AT8BPAGEAbQBZgEwAe4BrgFQAQEB/wGuAVABAQH/Aa4BUAEBAf8B3QG2
++        AZUB/wH8AfQB8QH/AfoB7wHrAf8B+QHqAeMB/wH4AecB3gH/AfcB4wHaAf8B9QHiAdgB/wH0Ad0B0QH/
++        AdIBwQG3Af8BZAFKATYB/wgAAbcBogGTAf8B/AH2AfMB/wH8AfQB8QH/Af0B9gHzAf8BrgFQAQEB/wHp
++        AcwBtgH/Af0B+QH2Af8BrgFQAQEB/wHmAcUBrAH/AfcB5QHcAf8B7gHGAbMB/wFkAUoBNgH/CAABsgKI
++        AboBGwGjARsB/wHYAd0B0gH2AfcB9QHzAf8BngHYAZ4B/wEJAZkBCQH/AQIBlQECAf8BrwHOAa4B/wED
++        AZUBAwH/AecB7QHiAf8B+AHrAeYB/wH3AecB3wH/AfYB4gHaAf8BtwGiAZMB/wFkAUoBNgH/DAABvAGn
++        AZkB/wH+AfsB+AH/AeQB1AHIAf8BfwE7AQMB/wH1Ae0B6AH/Af0B9wH0Af8B+wHxAewB/wHyAeIB2gH/
++        AfgB6AHgAf8B9gHiAdcB/wG3AaIBkwH/AWQBSgE2Af8IAAFQAiABWQGwAW0BTgHUAa4BUAEBAf8B0gGs
++        AZkB6gH2Ae8B6QH/Ab4BcwE0Af8BuQFnASIB/wH+AfoB+AH/AecBygGzAf8B/AHzAe8B/wH6Ae8B6gH/
++        AfoB7QHoAf8B5QHDAakB/wH4AegB4AH/AdsBzAHGAf8BagFQAT0B/wgAAboBpQGWAf8B/QH5AfYB/wH9
++        AfgB9gH/Af4B+QH3Af8BrgFQAQEB/wHpAc8BugH/Af4C/QH/Aa4BUAEBAf8B5gHIAbAB/wH4AekB4QH/
++        Ae8ByAG2Af8BZAFKATYB/wgAAcECnQHIAQEBmQEBAf8B3wLKAeMB+AH1AfMJ/wEEAZYBBAH/AQMBlQED
++        Af8BAgGUAQIB/wHgAesB3gH/AfsB8gHvAf8B+QHrAeUB/wH4AegB3wH/AbcBogGTAf8BZAFKATYB/wwA
++        AcABrAGdAf8B/gH9AfwB/wHcAcgBuQH/AX8BOwEDAf8B/gH7AfoB/wH9AfcB9QH/AfwB8wHvAf8B+gHw
++        AewB/wH4AesB5QH/AfcB5AHdAf8BtwGiAZMB/wFkAUoBNgH/CAABZwIzAXEBtwFqATQB8QG6AW0BLwH7
++        AboClAHCAfEB7AHpAf8B9AHnAdsB/wH+Av0B/wH+Af0B/AH/Aa4BUAEBAf8B/QH5AfcB/wH9AfcB9AH/
++        AfwB9gH0Af8BrgFQAQEB/wH7AfIB7gH/AeMB2AHSAf8BbgFWAUMB/wgAAb4BqQGaAf8B/gH8AfsB/wH9
++        AvoB/wH+AfsB+gH/Aa4BUAEBAf8B2QGtAYgB/wH6AfIB7QH/Aa4BUAEBAf8B5gHIAbAB/wH4AekB4wH/
++        AfABywG6Af8BZAFKATYB/wgAAbICiAG6AQEBmQEBAf8B2AHdAdIB9gH4AfYB9AH/AXoByQF6Af8BCQGZ
++        AQkB/wEEAZYBBAH/AesB8wHqAf8BAgGUAQIB/wEEAZYBBAH/Af0B+AH2Af8B+wHvAeoB/wH5AewB5gH/
++        AbcBogGTAf8BZAFKATYB/wwAAcQBsAGgAf8D/gH/AfUB8QHsAf8BfwE7AQMB/wHkAdYBygH/Af4B+gH5
++        Af8B9QHrAeUB/wHBAZ0BgQH/AfIB4wHbAf8B+QHqAeIB/wG3AaIBkwH/AWQBSgE2Af8IAAFpAjUBcwG3
++        AWwBNQHyAb4BdwE/AfoBsQKHAbkB8AHrAecB/wP+Af8B9AHlAdoB/wGuAVABAQH/Aa4BUAEBAf8BrgFQ
++        AQEB/wH0AeUB2gH/Aa4BUAEBAf8BrgFQAQEB/wGuAVABAQH/Ad0BxAGxAf8BdAFdAUsB/wgAAcMBrgGe
++        Af8D/gH/Af4C/QH/Af4B/AH7Af8BrgFQAQEB/wHOAZUBZwH/Aa4BUAEBAf8BwwF9AUMB/wH7AfMB7wH/
++        AfkB7AHkAf8B8AHOAb0B/wFkAUoBNgH/CAABdAI/AX4B2AHdAdIB9gEbAaMBGwH/AQEBmQEBAf8B4gHu
++        AeIB/wHiAe4B4gH/AQIBlAECAf8BBgGXAQYB/wEBAZkBAQH/AcsB3wHKAf8B/QH6AfkB/wH7AfQB7wH/
++        AbcBogGTAf8BtwGiAZMB/wFlAUsBNwH/DAAByAGzAaQJ/wG6AZUBeQH/AY8BVQEkAf8BwgGiAYcB/wGg
++        AW4BRQH/AZcBYQE0Af8B+wHvAeoB/wH5AewB5gH/AbcBogGTAf8BZAFKATYB/wgAAVcCJQFgAbMBbwFK
++        Ad0BrgFQAQEB/wHPAa8BqwHZAfoB+AH3Af8B2QGtAYgB/wHjAcIBpgL/Av4B/wGuAVABAQH/Af4B/AH7
++        Af8B/gH6AfkB/wH9AfkB+AH/Aa4BUAEBAf8B/AH2AfMB/wHoAd8B2gH/AW4BVgFDAf8IAAHIAbIBowr/
++        Af4B/QH/Aa4BUAEBAf8B6QHPAbkB/wH+AfsB+QH/AfwB9wH0Af8B/AHyAe4B/wH5Ae0B6AH/AfEB0QHC
++        Af8BZAFKATYB/wgAASgCCQEuAY8CXAGZAb0ClwHEAfQB7wHsCf8BCgGZAQoB/wHfAewB3wH/AQEBlAEB
++        Af8BCgGZAQoB/wH+AvwB/wG3AaIBkwH/AWUBSwE3Af8BZQFLATcB/wFlAUsBNwH/DAABzAG2AacN/wHd
++        AcoBuwH/AcMBogGIAf8BwgGhAYcB/wH1AewB5wH/AfsB9AHvAf8BtwGiAZMB/wG3AaIBkwH/AWUBSwE3
++        Af8IAAE4AhEBPwGIAU8BSAGZAbABWAEPAfwBswFYARAB/QG9AXEBMgH/Aa4BUAEBAf8B3AGzAZEF/wHt
++        AdgBxgH/Af4C/AH/Af4B+wH5Af8B/QH5AfcB/wHuAdoBygH/Ae0B5gHiAf8B5wHdAdkB/wFqAVEBPgH/
++        CAABzAG2AacN/wHZAawBhwH/AfMB5gHaAf8B/gH7AfkB/wH8AfcB9QH/AfsB9QHwAf8B9AHdAdEB/wHz
++        AdcByQH/AWUBSwE3Af8IAAEEAgEBBAEJAgEBCgEEAgEBBAHWAcABsBH/AQgBmAEIAf8B3wHsAd8B/wH+
++        Av0B/wG5AaQBlQH/AdQBxQG6Af8BZAFKATYB/wGVAW4BYAHiDAAB0QG7AasS/wL+Af8B/gL8Af8B/QH6
++        AfkB/wG3AaIBkwH/AWUBSwE3Af8BZQFLATcB/wFlAUsBNwH/CAABGQIEAR0BQgIWAUoBewFDAUABiAGr
++        AWcBSQHQAdQBpgGAAf8B3wG5AZkO/wH+Af0B/wH+AvsB/wH9AfkB+AH/Ab4BqwGeAf8BbwFXAUQB/wFq
++        AVEBPQH/AWUBSwE3Af8IAAHRAbsBqxL/Af4B/QH/Af4C+wH/Af0B+QH4Af8BtwGiAZMB/wFlAUsBNwH/
++        AWUBSwE3Af8BZQFLATcB/xQAAdgBwgGyG/8B/gH/AcABqwGcAf8BZAFKATYB/wGVAW0BYAHhEAAB1QG/
++        Aa8W/wL+Af8B/gH8AfsB/wG5AaQBlQH/AdQBxQG6Af8BZAFKATYB/wF3AT4BNgGpCAABCAIBAQgBGQIE
++        ARwBMQINATgBSQIbAVIB7wHnAeAW/wL+Af8B/gH8AfsB/wG6AaUBlgH/AdQBxQG7Af8BZQFLATcB/wF3
++        AT4BNgGpCAAB1QG/Aa8W/wL+Af8B/gH8AfsB/wG5AaQBlQH/AdQBxQG6Af8BZAFKATYB/wF3AT4BNgGp
++        FAAB2AHCAbIB/wHYAcIBsgH/AdgBwgGyAf8B2AHCAbIB/wHYAcIBsgH/AdgBwgGyAf8B1AG+Aa4B/wHP
++        AbkBqQH/AckBswGkAf8BoQFxAWgByhQAAdgBwgGyG/8B/gH/AcABqwGcAf8BZAFKATYB/wF2AT0BNgGo
++        EAABBAIBAQQBCQIBAQoBEAICARIB2wHHAbgb/wH+Af8BwAGrAZwB/wFkAUoBNgH/AXYBPQE2AagMAAHY
++        AcIBshv/Af4B/wHAAasBnAH/AWQBSgE2Af8BdgE9ATYBqFQAAdgBwgGyAf8B2AHCAbIB/wHYAcIBsgH/
++        AdgBwgGyAf8B2AHCAbIB/wHYAcIBsgH/AdQBvgGuAf8BzwG5AakB/wHJAbMBpAH/AXEBNgExAYsgAAHY
++        AcIBsgH/AdgBwgGyAf8B2AHCAbIB/wHYAcIBsgH/AdgBwgGyAf8B2AHCAbIB/wHUAb4BrgH/Ac8BuQGp
++        Af8ByQGzAaQB/wFxATYBMQGLEAAB2AHCAbIB/wHYAcIBsgH/AdgBwgGyAf8B2AHCAbIB/wHYAcIBsgH/
++        AdgBwgGyAf8B1AG+Aa4B/wHPAbkBqQH/AckBswGkAf8BcQE2ATEBixAAAUIBTQE+BwABPgMAASgDAAFA
++        AwABIAMAAQEBAAEBBgABARYAA/+BAAHgAQEG/wHgAQEBwAEDAfABAAHAAQMB4AEBAcABAwHwAQABwAED
++        AeABAQHAAQMBgAEAAcABAwHgAQEBwAEDAgABwAEDAQABAQHAAQMCAAHAAQMBAAEBAcABAwIAAcABAwEA
++        AQEBwAEDAgABwAEDAQABAQHAAQMCAAHAAQMBAAEBAcABAwIAAcABAwEAAQEBwAEDAgABwAEDAQABAQHA
++        AQMCAAHAAQMBAAEBAcABAwIAAcABAwHgAQMBwAEDAgABwAEDAeABBwHAAQcBgAEBAcABBwL/AcABDwHw
++        AQMBwAEPCw==
++</value>
++  </data>
++</root>
+\ No newline at end of file
+
+Modified: trunk/OCInterface/OCInterface.csproj
+===================================================================
+--- trunk/OCInterface/OCInterface.csproj	2006-10-24 18:40:46 UTC (rev 7)
++++ trunk/OCInterface/OCInterface.csproj	2006-11-12 11:47:01 UTC (rev 8)
+@@ -33,9 +33,21 @@
+     <Reference Include="System.Xml" />
+   </ItemGroup>
+   <ItemGroup>
++    <Compile Include="AboutForm.cs">
++    </Compile>
++    <Compile Include="AboutForm.Designer.cs">
++      <DependentUpon>AboutForm.cs</DependentUpon>
++    </Compile>
++    <Compile Include="OpenCloggerAttributes.cs" />
++    <Compile Include="Properties\AssemblyInfo.cs" />
+     <Compile Include="SvnAttributes.cs" />
+-    <Compile Include="Properties\AssemblyInfo.cs" />
+   </ItemGroup>
++  <ItemGroup>
++    <EmbeddedResource Include="AboutForm.resx">
++      <DependentUpon>AboutForm.cs</DependentUpon>
++      <SubType>Designer</SubType>
++    </EmbeddedResource>
++  </ItemGroup>
+   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+        Other similar extension points exist, see Microsoft.Common.targets.
+
+Added: trunk/OCInterface/OpenCloggerAttributes.cs
+===================================================================
+--- trunk/OCInterface/OpenCloggerAttributes.cs	2006-10-24 18:40:46 UTC (rev 7)
++++ trunk/OCInterface/OpenCloggerAttributes.cs	2006-11-12 11:47:01 UTC (rev 8)
+@@ -0,0 +1,33 @@
++/////////////////////////////////////////////////////////////////////////////////////////////////////////////
++//
++// OCInterface - OCInterface - OpenCloggerAttributes.cs
++// $Id$
++// $HeadURL$
++//
++// Copyright (c) 2006 OCInterface Project
++//
++// This file is part of the sources for OCInterface. It
++// is released under the OCInterface License. Details of
++// the license can be found in the LICENSE file in the
++// root of the distribution or at the following URL:
++//
++// http://svn.berlios.de/svnroot/repos/openclogger/trunk/LICENSE
++//
++
++using System;
++
++// Subversion version control attributes
++using OCInterface.SvnAttributes;
++[assembly: SvnId( "$Id$" )]
++[assembly: SvnHeadUrl( "$HeadURL$" )]
++
++namespace OCInterface.OpenCloggerAttributes
++{
++    [AttributeUsage(AttributeTargets.Assembly, AllowMultiple=false, Inherited=false)]
++    public class OpenCloggerAssembly : Attribute
++    { }
++
++    [AttributeUsage( AttributeTargets.Assembly, AllowMultiple = false, Inherited = false )]
++    public class OpenCloggerPlugin : Attribute
++    { }
++}
+
+
+Property changes on: trunk/OCInterface/OpenCloggerAttributes.cs
+___________________________________________________________________
+Name: svn:keywords
+   + Id Date HeadURL Author Revision
+Name: svn:eol-style
+   + native
+
+Modified: trunk/OCInterface/Properties/AssemblyInfo.cs
+===================================================================
+--- trunk/OCInterface/Properties/AssemblyInfo.cs	2006-10-24 18:40:46 UTC (rev 7)
++++ trunk/OCInterface/Properties/AssemblyInfo.cs	2006-11-12 11:47:01 UTC (rev 8)
+@@ -18,6 +18,7 @@
+ using System.Reflection;
+ using System.Runtime.CompilerServices;
+ using System.Runtime.InteropServices;
++using OCInterface.OpenCloggerAttributes;
+ using OCInterface.SvnAttributes;
+ 
+ // General Information about an assembly is controlled through the following 
+@@ -55,10 +56,8 @@
+ [assembly: AssemblyVersion("0.0.1.0")]
+ [assembly: AssemblyFileVersion("0.0.1.0")]
+ [assembly: AssemblyInformationalVersion("0.0.1.0")]
++[assembly: OpenCloggerAssembly()]
+ 
+ // Subversion version control attributes
+-[assembly: SvnId("AssemblyInfo.cs", "$Id$")]
+-[assembly: SvnRevision("AssemblyInfo.cs", "$Revision$")]
+-[assembly: SvnAuthor("AssemblyInfo.cs", "$Author$")]
+-[assembly: SvnHeadUrl("AssemblyInfo.cs", "$HeadURL$")]
+-[assembly: SvnDate("AssemblyInfo.cs", "$Date$")]
+\ No newline at end of file
++[assembly: SvnId("$Id$")]
++[assembly: SvnHeadUrl("$HeadURL$")]
+\ No newline at end of file
+
+Modified: trunk/OCInterface/SvnAttributes.cs
+===================================================================
+--- trunk/OCInterface/SvnAttributes.cs	2006-10-24 18:40:46 UTC (rev 7)
++++ trunk/OCInterface/SvnAttributes.cs	2006-11-12 11:47:01 UTC (rev 8)
+@@ -1,4 +1,4 @@
+-/////////////////////////////////////////////////////////
++/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ //
+ // OCInterface - OCInterface - SvnAttributes.cs
+ // $Id$
+@@ -15,126 +15,110 @@
+ //
+ 
+ using System;
++using System.Text.RegularExpressions;
+ 
+ // Subversion version control attributes
+ using OCInterface.SvnAttributes;
+-[assembly: SvnId("SvnAttributes.cs", "$Id$")]
+-[assembly: SvnRevision("SvnAttributes.cs", "$Revision$")]
+-[assembly: SvnAuthor("SvnAttributes.cs", "$Author$")]
+-[assembly: SvnHeadUrl("SvnAttributes.cs", "$HeadURL$")]
+-[assembly: SvnDate("SvnAttributes.cs", "$Date$")]
++[assembly: SvnId("$Id$")]
++[assembly: SvnHeadUrl("$HeadURL$")]
+ 
+ namespace OCInterface.SvnAttributes
+ {
+-    [AttributeUsage(AttributeTargets.Assembly, AllowMultiple=true, Inherited=false)]
+-    public class SvnRevisionAttribute : Attribute
+-    {
+-        public SvnRevisionAttribute( string file, string revision )
+-        {
+-            mSvnRevision = (string)revision.Clone();
+-        }
+-
+-        public string SvnRevision
+-        {
+-            get { return mSvnRevision; }
+-        }
+-
+-        public int Revision
+-        {
+-            get
+-            {
+-                return 0;
+-            }
+-        }
+-
+-        private string mSvnRevision = null;
+-    }
+-
+     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true, Inherited = false)]
+     public class SvnIdAttribute : Attribute
+     {
+-        public SvnIdAttribute(string file, string id)
++        public SvnIdAttribute(string id)
+         {
+             mSvnId = (string)id.Clone();
+-        }
+ 
+-        public string SvnId
+-        {
+-            get { return mSvnId; }
+-        }
++            string regexFile   = @"\s+(?<file>.*\..{2,5})";
++            string regexRev    = @"\s+(?<rev>\d+)";
++            string regexDate   = @"\s+(?<date>(?<year>\d{4})-(?<month>\d{1,2})-(?<day>\d{1,2}))";
++            string regexTime   = @"\s+(?<time>(?<hour>\d{2}):(?<min>\d{2}):(?<sec>\d{2}))\w";
++            string regexAuthor = @"\s+(?<author>\w+)";
+ 
+-        private string mSvnId = null;
+-    }
++            string regex = @"^[$]Id:"+regexFile+regexRev+regexDate+regexTime+regexAuthor+@"\s[$]$";
++            Match match = new Regex( regex ).Match( SvnId );
++            mFile = match.Result( @"${file}" );
++            mRevision = match.Result( @"${rev}" );
++            mAuthor = match.Result( @"${author}" );
+ 
+-    [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true, Inherited = false)]
+-    public class SvnAuthorAttribute : Attribute
+-    {
+-        public SvnAuthorAttribute(string file, string author)
+-        {
+-            mSvnAuthor = (string)author.Clone();
+-        }
++            int year = Convert.ToInt32( match.Result( @"${year}" ) );
++            int month = Convert.ToInt32( match.Result( @"${month}" ) );
++            int day = Convert.ToInt32( match.Result( @"${day}" ) );
++            int hour = Convert.ToInt32( match.Result( @"${hour}" ) );
++            int min = Convert.ToInt32( match.Result( @"${min}" ) );
++            int second = Convert.ToInt32( match.Result( @"${sec}" ) );
+ 
+-        public string SvnAuthor
+-        {
+-            get { return mSvnAuthor; }
++            mLastEdit = new DateTime( year, month, day, hour, min, second, DateTimeKind.Utc );
+         }
+ 
++        public string File
++        { get { return mFile; } }
++
++        public string Revision
++        { get { return mRevision; } }
++
+         public string Author
+-        {
+-            get
+-            {
+-                return null;
+-            }
+-        }
++        { get { return mAuthor; } }
+ 
+-        private string mSvnAuthor = null;
++        public DateTime LastEdit
++        { get { return mLastEdit; } }
++
++        public string SvnId
++        { get { return mSvnId; } }
++
++        private string mSvnId = null;
++        private string mFile = null;
++        private string mAuthor = null;
++        private string mRevision = null;
++        private DateTime mLastEdit = DateTime.MinValue;
+     }
+ 
+     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true, Inherited = false)]
+     public class SvnHeadUrlAttribute : Attribute
+     {
+-        public SvnHeadUrlAttribute(string file, string headUrl)
++        public SvnHeadUrlAttribute(string headUrl)
+         {
+             mSvnHeadUrl = (string)headUrl.Clone();
+-        }
+ 
+-        public string SvnHeadUrl
+-        {
+-            get { return mSvnHeadUrl; }
+-        }
+-
+-        public string HeadUrl
+-        {
+-            get
++            string regex = @"^[$]HeadURL:\s(?<linkurl>" + RootURL +
++                @"(?<branch>(?:trunk|(?<type>tags/|branches/)(?<code>\w+)))" +
++                @"/(?<path>(?:.*/)*(?<file>.*\..{2,5})))\s[$]$";
++            Match match = new Regex( regex ).Match( SvnHeadUrl );
++            mSvnFile = match.Result( @"${file}" );
++            mLinkUrl = match.Result( @"${linkurl}" );
++            mHeadUrl = match.Result( @"${path}" );
++            if ( match.Result( @"${branch}" ) == "trunk" )
+             {
+-                return null;
++                mBranch = "Trunk";
+             }
++            else
++            {
++                mBranch = match.Result( @"${type}-${code}" );
++            }
+         }
+ 
+-        private string mSvnHeadUrl = null;
+-    }
++        public string File
++        { get { return mSvnFile; } }
+ 
+-    [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true, Inherited = false)]
+-    public class SvnDateAttribute : Attribute
+-    {
+-        public SvnDateAttribute(string file, string date)
+-        {
+-            mSvnDate = (string)date.Clone();
+-        }
++        public string SvnHeadUrl
++        { get { return mSvnHeadUrl; } }
+ 
+-        public string SvnDate
+-        {
+-            get { return mSvnDate; }
+-        }
++        public string URL
++        { get { return mLinkUrl; } }
+ 
+-        public string Date
+-        {
+-            get
+-            {
+-                return null;
+-            }
+-        }
++        public string Path
++        { get { return mHeadUrl; } }
+ 
+-        private string mSvnDate = null;
++        public string Branch
++        { get { return mBranch; } }
++
++        private string mSvnFile = null;
++        private string mLinkUrl = null;
++        private string mSvnHeadUrl = null;
++        private string mHeadUrl = null;
++        private string mBranch = null;
++        private readonly string RootURL = @"http://svn.berlios.de/svnroot/repos/openclogger/";
+     }
+ }
+
+Modified: trunk/OpenClogger/MainForm.Designer.cs
+===================================================================
+--- trunk/OpenClogger/MainForm.Designer.cs	2006-10-24 18:40:46 UTC (rev 7)
++++ trunk/OpenClogger/MainForm.Designer.cs	2006-11-12 11:47:01 UTC (rev 8)
+@@ -1,4 +1,4 @@
+-/////////////////////////////////////////////////////////
++/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ //
+ // OpenClogger - OpenClogger - MainForm.Designer.cs
+ // $Id$
+@@ -16,11 +16,8 @@
+ 
+ // Subversion version control attributes
+ using OCInterface.SvnAttributes;
+-[assembly: SvnId("MainForm.Designer.cs", "$Id$")]
+-[assembly: SvnRevision("MainForm.Designer.cs", "$Revision$")]
+-[assembly: SvnAuthor("MainForm.Designer.cs", "$Author$")]
+-[assembly: SvnHeadUrl("MainForm.Designer.cs", "$HeadURL$")]
+-[assembly: SvnDate("MainForm.Designer.cs", "$Date$")]
++[assembly: SvnId("$Id$")]
++[assembly: SvnHeadUrl("$HeadURL$")]
+ 
+ namespace OpenClogger
+ {
+@@ -52,9 +49,18 @@
+         /// </summary>
+         private void InitializeComponent()
+         {
+-            this.components = new System.ComponentModel.Container();
++            this.SuspendLayout();
++            // 
++            // MainForm
++            // 
++            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
++            this.ClientSize = new System.Drawing.Size(292, 273);
++            this.Name = "MainForm";
+             this.Text = "Form1";
++            this.Load += new System.EventHandler(this.MainForm_Load);
++            this.ResumeLayout(false);
++
+         }
+ 
+         #endregion
+
+Modified: trunk/OpenClogger/MainForm.cs
+===================================================================
+--- trunk/OpenClogger/MainForm.cs	2006-10-24 18:40:46 UTC (rev 7)
++++ trunk/OpenClogger/MainForm.cs	2006-11-12 11:47:01 UTC (rev 8)
+@@ -1,4 +1,4 @@
+-/////////////////////////////////////////////////////////
++/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ //
+ // OpenClogger - OpenClogger - MainForm.cs
+ // $Id$
+@@ -25,11 +25,8 @@
+ 
+ // Subversion version control attributes
+ using OCInterface.SvnAttributes;
+-[assembly: SvnId("MainForm.cs", "$Id$")]
+-[assembly: SvnRevision("MainForm.cs", "$Revision$")]
+-[assembly: SvnAuthor("MainForm.cs", "$Author$")]
+-[assembly: SvnHeadUrl("MainForm.cs", "$HeadURL$")]
+-[assembly: SvnDate("MainForm.cs", "$Date$")]
++[assembly: SvnId("$Id$")]
++[assembly: SvnHeadUrl("$HeadURL$")]
+ 
+ namespace OpenClogger
+ {
+@@ -39,5 +36,12 @@
+         {
+             InitializeComponent();
+         }
++
++        private void MainForm_Load(object sender, EventArgs e)
++        {
++            AboutForm about = new AboutForm();
++            about.ShowDialog( this );
++            Application.Exit();
++        }
+     }
+ }
+\ No newline at end of file
+
+Added: trunk/OpenClogger/MainForm.resx
+===================================================================
+--- trunk/OpenClogger/MainForm.resx	2006-10-24 18:40:46 UTC (rev 7)
++++ trunk/OpenClogger/MainForm.resx	2006-11-12 11:47:01 UTC (rev 8)
+@@ -0,0 +1,120 @@
++<?xml version="1.0" encoding="utf-8"?>
++<root>
++  <!-- 
++    Microsoft ResX Schema 
++    
++    Version 2.0
++    
++    The primary goals of this format is to allow a simple XML format 
++    that is mostly human readable. The generation and parsing of the 
++    various data types are done through the TypeConverter classes 
++    associated with the data types.
++    
++    Example:
++    
++    ... ado.net/XML headers & schema ...
++    <resheader name="resmimetype">text/microsoft-resx</resheader>
++    <resheader name="version">2.0</resheader>
++    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
++    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
++    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
++    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
++    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
++        <value>[base64 mime encoded serialized .NET Framework object]</value>
++    </data>
++    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
++        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
++        <comment>This is a comment</comment>
++    </data>
++                
++    There are any number of "resheader" rows that contain simple 
++    name/value pairs.
++    
++    Each data row contains a name, and value. The row also contains a 
++    type or mimetype. Type corresponds to a .NET class that support 
++    text/value conversion through the TypeConverter architecture. 
++    Classes that don't support this are serialized and stored with the 
++    mimetype set.
++    
++    The mimetype is used for serialized objects, and tells the 
++    ResXResourceReader how to depersist the object. This is currently not 
++    extensible. For a given mimetype the value must be set accordingly:
++    
++    Note - application/x-microsoft.net.object.binary.base64 is the format 
++    that the ResXResourceWriter will generate, however the reader can 
++    read any of the formats listed below.
++    
++    mimetype: application/x-microsoft.net.object.binary.base64
++    value   : The object must be serialized with 
++            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
++            : and then encoded with base64 encoding.
++    
++    mimetype: application/x-microsoft.net.object.soap.base64
++    value   : The object must be serialized with 
++            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
++            : and then encoded with base64 encoding.
++
++    mimetype: application/x-microsoft.net.object.bytearray.base64
++    value   : The object must be serialized into a byte array 
++            : using a System.ComponentModel.TypeConverter
++            : and then encoded with base64 encoding.
++    -->
++  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
++    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
++    <xsd:element name="root" msdata:IsDataSet="true">
++      <xsd:complexType>
++        <xsd:choice maxOccurs="unbounded">
++          <xsd:element name="metadata">
++            <xsd:complexType>
++              <xsd:sequence>
++                <xsd:element name="value" type="xsd:string" minOccurs="0" />
++              </xsd:sequence>
++              <xsd:attribute name="name" use="required" type="xsd:string" />
++              <xsd:attribute name="type" type="xsd:string" />
++              <xsd:attribute name="mimetype" type="xsd:string" />
++              <xsd:attribute ref="xml:space" />
++            </xsd:complexType>
++          </xsd:element>
++          <xsd:element name="assembly">
++            <xsd:complexType>
++              <xsd:attribute name="alias" type="xsd:string" />
++              <xsd:attribute name="name" type="xsd:string" />
++            </xsd:complexType>
++          </xsd:element>
++          <xsd:element name="data">
++            <xsd:complexType>
++              <xsd:sequence>
++                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
++                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
++              </xsd:sequence>
++              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
++              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
++              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
++              <xsd:attribute ref="xml:space" />
++            </xsd:complexType>
++          </xsd:element>
++          <xsd:element name="resheader">
++            <xsd:complexType>
++              <xsd:sequence>
++                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
++              </xsd:sequence>
++              <xsd:attribute name="name" type="xsd:string" use="required" />
++            </xsd:complexType>
++          </xsd:element>
++        </xsd:choice>
++      </xsd:complexType>
++    </xsd:element>
++  </xsd:schema>
++  <resheader name="resmimetype">
++    <value>text/microsoft-resx</value>
++  </resheader>
++  <resheader name="version">
++    <value>2.0</value>
++  </resheader>
++  <resheader name="reader">
++    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
++  </resheader>
++  <resheader name="writer">
++    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
++  </resheader>
++</root>
+\ No newline at end of file
+
+Modified: trunk/OpenClogger/OpenClogger.csproj
+===================================================================
+--- trunk/OpenClogger/OpenClogger.csproj	2006-10-24 18:40:46 UTC (rev 7)
++++ trunk/OpenClogger/OpenClogger.csproj	2006-11-12 11:47:01 UTC (rev 8)
+@@ -44,6 +44,10 @@
+     </Compile>
+     <Compile Include="Program.cs" />
+     <Compile Include="Properties\AssemblyInfo.cs" />
++    <EmbeddedResource Include="MainForm.resx">
++      <SubType>Designer</SubType>
++      <DependentUpon>MainForm.cs</DependentUpon>
++    </EmbeddedResource>
+     <EmbeddedResource Include="Properties\Resources.resx">
+       <Generator>ResXFileCodeGenerator</Generator>
+       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+@@ -52,6 +56,7 @@
+     <Compile Include="Properties\Resources.Designer.cs">
+       <AutoGen>True</AutoGen>
+       <DependentUpon>Resources.resx</DependentUpon>
++      <DesignTime>True</DesignTime>
+     </Compile>
+     <None Include="Properties\Settings.settings">
+       <Generator>SettingsSingleFileGenerator</Generator>
+@@ -62,6 +67,7 @@
+       <DependentUpon>Settings.settings</DependentUpon>
+       <DesignTimeSharedInput>True</DesignTimeSharedInput>
+     </Compile>
++    <Compile Include="Settings.cs" />
+   </ItemGroup>
+   <ItemGroup>
+     <ProjectReference Include="..\OCControls\OCControls.csproj">
+@@ -73,6 +79,9 @@
+       <Name>OCInterface</Name>
+     </ProjectReference>
+   </ItemGroup>
++  <ItemGroup>
++    <None Include="vs_logo.png" />
++  </ItemGroup>
+   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+        Other similar extension points exist, see Microsoft.Common.targets.
+
+Modified: trunk/OpenClogger/Program.cs
+===================================================================
+--- trunk/OpenClogger/Program.cs	2006-10-24 18:40:46 UTC (rev 7)
++++ trunk/OpenClogger/Program.cs	2006-11-12 11:47:01 UTC (rev 8)
+@@ -1,4 +1,4 @@
+-/////////////////////////////////////////////////////////
++/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ //
+ // OpenClogger - OpenClogger - Program.cs
+ // $Id$
+@@ -20,11 +20,8 @@
+ 
+ // Subversion version control attributes
+ using OCInterface.SvnAttributes;
+-[assembly: SvnId("Program.cs", "$Id$")]
+-[assembly: SvnRevision("Program.cs", "$Revision$")]
+-[assembly: SvnAuthor("Program.cs", "$Author$")]
+-[assembly: SvnHeadUrl("Program.cs", "$HeadURL$")]
+-[assembly: SvnDate("Program.cs", "$Date$")]
++[assembly: SvnId("$Id$")]
++[assembly: SvnHeadUrl("$HeadURL$")]
+ 
+ namespace OpenClogger
+ {
+@@ -38,7 +35,7 @@
+         {
+             Application.EnableVisualStyles();
+             Application.SetCompatibleTextRenderingDefault(false);
+-            Application.Run(new MainForm());
++            Application.Run(new AboutForm());
+         }
+     }
+ }
+\ No newline at end of file
+
+Modified: trunk/OpenClogger/Properties/AssemblyInfo.cs
+===================================================================
+--- trunk/OpenClogger/Properties/AssemblyInfo.cs	2006-10-24 18:40:46 UTC (rev 7)
++++ trunk/OpenClogger/Properties/AssemblyInfo.cs	2006-11-12 11:47:01 UTC (rev 8)
+@@ -19,6 +19,7 @@
+ using System.Runtime.CompilerServices;
+ using System.Runtime.InteropServices;
+ using OCInterface.SvnAttributes;
++using OCInterface.OpenCloggerAttributes;
+ 
+ // General Information about an assembly is controlled through the following 
+ // set of attributes. Change these attribute values to modify the information
+@@ -55,10 +56,8 @@
+ [assembly: AssemblyVersion("0.0.1.0")]
+ [assembly: AssemblyFileVersion("0.0.1.0")]
+ [assembly: AssemblyInformationalVersion("0.0.1.0")]
++[assembly: OpenCloggerAssembly]
+ 
+ // Subversion version control attributes
+-[assembly: SvnId("AssemblyInfo.cs", "$Id$")]
+-[assembly: SvnRevision("AssemblyInfo.cs", "$Revision$")]
+-[assembly: SvnAuthor("AssemblyInfo.cs", "$Author$")]
+-[assembly: SvnHeadUrl("AssemblyInfo.cs", "$HeadURL$")]
+-[assembly: SvnDate("AssemblyInfo.cs", "$Date$")]
+\ No newline at end of file
++[assembly: SvnId("$Id$")]
++[assembly: SvnHeadUrl("$HeadURL$")]
+\ No newline at end of file
+
+Modified: trunk/OpenClogger/Properties/Resources.Designer.cs
+===================================================================
+--- trunk/OpenClogger/Properties/Resources.Designer.cs	2006-10-24 18:40:46 UTC (rev 7)
++++ trunk/OpenClogger/Properties/Resources.Designer.cs	2006-11-12 11:47:01 UTC (rev 8)
+@@ -8,10 +8,10 @@
+ // </auto-generated>
+ //------------------------------------------------------------------------------
+ 
+-namespace OpenClogger.Properties
+-{
+-
+-
++namespace OpenClogger.Properties {
++    using System;
++    
++    
+     /// <summary>
+     ///   A strongly-typed resource class, for looking up localized strings, etc.
+     /// </summary>
+@@ -22,50 +22,49 @@
+     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "2.0.0.0")]
+     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
+-    internal class Resources
+-    {
+-
++    internal class Resources {
++        
+         private static global::System.Resources.ResourceManager resourceMan;
+-
++        
+         private static global::System.Globalization.CultureInfo resourceCulture;
+-
++        
+         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
+-        internal Resources()
+-        {
++        internal Resources() {
+         }
+-
++        
+         /// <summary>
+         ///   Returns the cached ResourceManager instance used by this class.
+         /// </summary>
+         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
+-        internal static global::System.Resources.ResourceManager ResourceManager
+-        {
+-            get
+-            {
+-                if ((resourceMan == null))
+-                {
++        internal static global::System.Resources.ResourceManager ResourceManager {
++            get {
++                if (object.ReferenceEquals(resourceMan, null)) {
+                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("OpenClogger.Properties.Resources", typeof(Resources).Assembly);
+                     resourceMan = temp;
+                 }
+                 return resourceMan;
+             }
+         }
+-
++        
+         /// <summary>
+         ///   Overrides the current thread's CurrentUICulture property for all
+         ///   resource lookups using this strongly typed resource class.
+         /// </summary>
+         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
+-        internal static global::System.Globalization.CultureInfo Culture
+-        {
+-            get
+-            {
++        internal static global::System.Globalization.CultureInfo Culture {
++            get {
+                 return resourceCulture;
+             }
+-            set
+-            {
++            set {
+                 resourceCulture = value;
+             }
+         }
++        
++        internal static System.Drawing.Bitmap vs_logo {
++            get {
++                object obj = ResourceManager.GetObject("vs_logo", resourceCulture);
++                return ((System.Drawing.Bitmap)(obj));
++            }
++        }
+     }
+ }
+
+Modified: trunk/OpenClogger/Properties/Resources.resx
+===================================================================
+--- trunk/OpenClogger/Properties/Resources.resx	2006-10-24 18:40:46 UTC (rev 7)
++++ trunk/OpenClogger/Properties/Resources.resx	2006-11-12 11:47:01 UTC (rev 8)
+@@ -46,7 +46,7 @@
+     
+     mimetype: application/x-microsoft.net.object.binary.base64
+     value   : The object must be serialized with 
+-            : System.Serialization.Formatters.Binary.BinaryFormatter
++            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+             : and then encoded with base64 encoding.
+     
+     mimetype: application/x-microsoft.net.object.soap.base64
+@@ -60,6 +60,7 @@
+             : and then encoded with base64 encoding.
+     -->
+   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
++    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+     <xsd:element name="root" msdata:IsDataSet="true">
+       <xsd:complexType>
+         <xsd:choice maxOccurs="unbounded">
+@@ -68,9 +69,10 @@
+               <xsd:sequence>
+                 <xsd:element name="value" type="xsd:string" minOccurs="0" />
+               </xsd:sequence>
+-              <xsd:attribute name="name" type="xsd:string" />
++              <xsd:attribute name="name" use="required" type="xsd:string" />
+               <xsd:attribute name="type" type="xsd:string" />
+               <xsd:attribute name="mimetype" type="xsd:string" />
++              <xsd:attribute ref="xml:space" />
+             </xsd:complexType>
+           </xsd:element>
+           <xsd:element name="assembly">
+@@ -85,9 +87,10 @@
+                 <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                 <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+               </xsd:sequence>
+-              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
++              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+               <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+               <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
++              <xsd:attribute ref="xml:space" />
+             </xsd:complexType>
+           </xsd:element>
+           <xsd:element name="resheader">
+@@ -114,4 +117,8 @@
+   <resheader name="writer">
+     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+   </resheader>
++  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
++  <data name="vs_logo" type="System.Resources.ResXFileRef, System.Windows.Forms">
++    <value>..\vs_logo.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
++  </data>
+ </root>
+\ No newline at end of file
+
+Added: trunk/OpenClogger/Settings.cs
+===================================================================
+--- trunk/OpenClogger/Settings.cs	2006-10-24 18:40:46 UTC (rev 7)
++++ trunk/OpenClogger/Settings.cs	2006-11-12 11:47:01 UTC (rev 8)
+@@ -0,0 +1,50 @@
++/////////////////////////////////////////////////////////////////////////////////////////////////////////////
++//
++// OpenClogger - OpenClogger - Settings.cs
++// $Id$
++// $HeadURL$
++//
++// Copyright (c) 2006 OpenClogger Project
++//
++// This file is part of the sources for OpenClogger. It
++// is released under the OpenClogger License. Details of
++// the license can be found in the LICENSE file in the
++// root of the distribution or at the following URL:
++//
++// http://svn.berlios.de/svnroot/repos/openclogger/trunk/LICENSE
++//
++
++// Subversion version control attributes
++using OCInterface.SvnAttributes;
++[assembly: SvnId( "$Id$" )]
++[assembly: SvnHeadUrl( "$HeadURL$" )]
++
++namespace OpenClogger.Properties
++{
++    
++    
++    // This class allows you to handle specific events on the settings class:
++    //  The SettingChanging event is raised before a setting's value is changed.
++    //  The PropertyChanged event is raised after a setting's value is changed.
++    //  The SettingsLoaded event is raised after the setting values are loaded.
++    //  The SettingsSaving event is raised before the setting values are saved.
++    internal sealed partial class Settings {
++        
++        public Settings() {
++            // // To add event handlers for saving and changing settings, uncomment the lines below:
++            //
++            // this.SettingChanging += this.SettingChangingEventHandler;
++            //
++            // this.SettingsSaving += this.SettingsSavingEventHandler;
++            //
++        }
++        
++        private void SettingChangingEventHandler(object sender, System.Configuration.SettingChangingEventArgs e) {
++            // Add code to handle the SettingChangingEvent event here.
++        }
++        
++        private void SettingsSavingEventHandler(object sender, System.ComponentModel.CancelEventArgs e) {
++            // Add code to handle the SettingsSaving event here.
++        }
++    }
++}
+
+
+Property changes on: trunk/OpenClogger/Settings.cs
+___________________________________________________________________
+Name: svn:keywords
+   + Id Date HeadURL Author Revision
+Name: svn:eol-style
+   + native
+
+Added: trunk/OpenClogger/icons/asm_large.ico
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/OpenClogger/icons/asm_large.ico
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/OpenClogger/icons/asm_small.ico
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/OpenClogger/icons/asm_small.ico
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/OpenClogger/icons/c_large.ico
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/OpenClogger/icons/c_large.ico
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/OpenClogger/icons/c_small.ico
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/OpenClogger/icons/c_small.ico
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/OpenClogger/icons/cpp_large.ico
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/OpenClogger/icons/cpp_large.ico
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/OpenClogger/icons/cpp_small.ico
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/OpenClogger/icons/cpp_small.ico
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/OpenClogger/icons/csharp_large.ico
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/OpenClogger/icons/csharp_large.ico
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/OpenClogger/icons/csharp_small.ico
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/OpenClogger/icons/csharp_small.ico
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/OpenClogger/icons/h_large.ico
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/OpenClogger/icons/h_large.ico
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/OpenClogger/icons/h_small.ico
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/OpenClogger/icons/h_small.ico
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/OpenClogger/vs_logo.png
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/OpenClogger/vs_logo.png
+___________________________________________________________________
+Name: svn:needs-lock
+   + *
+Name: svn:mime-type
+   + image/png
+
+
+
